@@ -14,19 +14,19 @@
 		<view v-if="detail.status=='B'" class="icon-can"></view>
 		<view v-else-if="detail.status=='C'" class="icon-cannot"></view>
 	</view>
-	<view class="confirm-form">
+	<view class="confirm-form">	
 		<u-form :model="form" label-width="140rpx">
 		  <u-form-item class="input" v-if="detail.type === 'P'" label="金额:">
 		    <u-input v-model="form.amount" placeholder="核销金额" />
 		  </u-form-item>
 		  <view v-if="detail.type === 'T'" class="coupon-timer">
 		    <view class="tips">完成情况({{detail.confirmCount}}/{{detail.useRule}})</view>
-			<row class="time-row" v-for="row in dataList">
-				<o-col :span="rowCount" v-for="item in row.data" class="time-item">
+			<uni-row class="time-row" v-for="row in dataList">
+				<uni-col :span="rowCount" v-for="item in row.data" class="time-item">
 					<view v-if="item.isActive == true" class="time active"></view>
 					<view v-else class="time"></view>
-				</o-col>
-			</row>
+				</uni-col>
+			</uni-row>
 		  </view>
 		  <u-form-item class="input" label="备注:" :border-bottom="false">
 		    <u-input v-model="form.remark" placeholder="核销备注" />
@@ -48,7 +48,6 @@
 	    <view class="btn-item cannot">不可核销</view>
 	  </view>
     </view>
-	
 	<!-- 快捷导航 -->
 	<shortcut/>
   </view>
@@ -57,14 +56,10 @@
 <script>
   import * as myCouponApi from '@/api/myCoupon'
   import * as confirmApi from '@/api/confirm'
-  import Row from '@/components/oveui-layout/row/row.vue'
-  import oCol from '@/components/oveui-layout/o-col/o-col.vue'
   import Shortcut from '@/components/merchant-shortcut'
-
+  
   export default {
 	components: {
-		Row,
-	    oCol,
 		Shortcut
 	},
     data() {
@@ -175,6 +170,7 @@
     background: #fff;
 	color:#666666;
   }
+  
   .base {
 	  border: dashed 5rpx #cccccc;
 	  padding: 30rpx;
@@ -239,23 +235,26 @@
 	.coupon-timer {
 		  border-radius: 10rpx;
 		  clear: both;
-		  overflow:auto;
+		  overflow: auto;
+		  margin-bottom: 10rpx;
 		  .tips {
-			  margin-bottom: 20rpx;
+			  margin-bottom: 60rpx;
 		  }
 		  .time-row {
 			  margin-bottom: 30rpx;
+			  height: 100rpx;
+			  display: flex;
 		  }
 		  .time-item {
-			  text-align: right;
+			  text-align: center;
 			  align-items: center;
 			  justify-content: center;
-			  display:flex;
 		  }
 		  .time {
 			  width: 80rpx;
 			  height: 80rpx;
 			  border: solid 1px #cccccc;
+			  margin-bottom: 30rpx;
 			  float: left;
 			  text-align: center;
 			  padding-top: 20rpx;
