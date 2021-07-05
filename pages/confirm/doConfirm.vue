@@ -8,7 +8,7 @@
 		  <view class="name">{{ detail.name }}</view>
 		  <view v-if="detail.amount > 0" class="price"><span class="label">面额：</span>￥{{ detail.amount }}</view>
 		  <view v-if="detail.type == 'P'" class="balance"><span class="label">余额：</span>￥{{ detail.balance }}</view>
-		  <view class="tips">{{ detail.tips }}</view>
+		  <view v-if="detail.tips" class="tips">{{ detail.tips }}</view>
 		  <view class="time">有效期：{{ detail.effectiveDate }}</view>
 		</view>
 		<view v-if="detail.status=='B'" class="icon-can"></view>
@@ -233,6 +233,8 @@
 		padding-left: 20rpx;
 		margin-bottom: 10rpx;
 		border-radius: 10rpx;
+		width: 98%;
+		display: inline-flex
 	}
 	.coupon-timer {
 		  border-radius: 10rpx;

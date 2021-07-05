@@ -2,7 +2,6 @@
   <view v-if="!isLoading" class="container">
     <!-- 页面头部 -->
     <view class="main-header" :style="{ paddingTop: $platform == 'H5' ? '0' : '50rpx' }">
-      <image class="bg-image" src="/static/background/merchant-header.png" mode="scaleToFill"></image>
       <!-- 用户信息 -->
       <view v-if="isLogin" class="user-info">
         <view class="user-content">
@@ -295,27 +294,22 @@
     display: flex;
     align-items: center;
     padding-left: 30rpx;
-
-    .bg-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-    }
+    background: #00acac;
 
     .user-info {
       display: flex;
       height: 100rpx;
 	  margin-top: 20rpx;
       z-index: 1;
-	  
+	  text-align: center;
+	  padding-left: 70rpx;
+	  width: 100%;
       .user-content {
         display: block;
         flex-direction: column;
         justify-content: center;
         margin-left: 30rpx;
+		text-align: left;
         color: #ffffff;
 		
         .nick-name {
@@ -347,7 +341,6 @@
             font-size: 24rpx;
             color: #EEE0C3;
           }
-
         }
 
         .login-tips {
@@ -360,6 +353,7 @@
 		  margin-left: 60rpx;
 		  color: #fff;
 		  display: block;
+		  text-align: left;
 		  .amount-tip {
 			  font-size: 24rpx;
 		  }
