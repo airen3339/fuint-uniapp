@@ -14,7 +14,7 @@
 		<view v-if="detail.status=='B'" class="icon-can"></view>
 		<view v-else-if="detail.status=='C'" class="icon-cannot"></view>
 	</view>
-	<view class="confirm-form">	
+	<view class="confirm-form">
 		<u-form :model="form" label-width="140rpx">
 		  <u-form-item class="input" v-if="detail.type === 'P'" label="金额:">
 		    <u-input v-model="form.amount" placeholder="核销金额" />
@@ -230,37 +230,38 @@
 		margin-bottom: 10rpx;
 		border-radius: 10rpx;
 		width: 98%;
-		display: inline-flex
+		display: inline-flex;
 	}
 	.coupon-timer {
 		  border-radius: 10rpx;
 		  clear: both;
-		  overflow: auto;
+		  overflow: hidden;
 		  margin-bottom: 10rpx;
+		  height: 100%;
 		  .tips {
 			  margin-bottom: 60rpx;
 		  }
 		  .time-row {
-			  margin-bottom: 30rpx;
+			  margin-bottom: 10rpx;
 			  height: 100rpx;
 			  display: flex;
 		  }
 		  .time-item {
+			  padding-top: 10rpx;
 			  text-align: center;
 			  align-items: center;
 			  justify-content: center;
 		  }
 		  .time {
-			  width: 80rpx;
 			  height: 80rpx;
-			  border: solid 1px #cccccc;
 			  margin-bottom: 30rpx;
-			  float: left;
 			  text-align: center;
 			  padding-top: 20rpx;
 			  border-radius: 40rpx;
 			  color: #ffffff;
 			  font-weight: bold;
+			  background: url('/static/confirm/undo.png') no-repeat center center;
+			  background-size: contain;
 		  }
 		  .active {
 			  background: url('/static/confirm/do.png') no-repeat center center;

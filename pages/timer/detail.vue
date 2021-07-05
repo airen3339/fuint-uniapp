@@ -11,12 +11,12 @@
 	</view>
 	<view class="coupon-timer">
 	  <view class="tips">完成情况({{detail.confirmCount}}/{{detail.useRule}})</view>
-	  <row class="time-row" v-for="row in dataList">
-	  	<o-col :span="rowCount" v-for="item in row.data" class="time-item">
-			<view v-if="item.isActive == true" class="time active"></view>
-			<view v-else class="time"></view>
-		</o-col>
-	  </row>
+	  <uni-row class="time-row" v-for="row in dataList">
+	  	<uni-col :span="rowCount" v-for="item in row.data" class="time-item">
+	  		<view v-if="item.isActive == true" class="time active"></view>
+	  		<view v-else class="time"></view>
+	  	</uni-col>
+	  </uni-row>
 	</view>
     <view class="coupon-qr">
       <view>
@@ -167,29 +167,31 @@
 	  padding: 15px 30rpx 5rpx 30rpx;
 	  border-radius: 10rpx;
 	  margin: 20rpx;
-	  overflow:auto;
+	  overflow: hidden;
 	  .tips{
 		  margin-bottom: 20rpx;
 	  }
 	  .time-row {
-	  	  margin-bottom: 30rpx;
+	  	  margin-bottom: 10rpx;
+	  	  height: 100rpx;
+	  	  display: flex;
 	  }
 	 .time-item {
-		  text-align: right;
+		  padding-top: 10rpx;
+		  text-align: center;
 		  align-items: center;
 		  justify-content: center;
-		  display:flex;
 	 }
 	 .time {
-		  width: 80rpx;
 		  height: 80rpx;
-		  border: solid 1px #cccccc;
-		  float: left;
+		  margin-bottom: 30rpx;
 		  text-align: center;
 		  padding-top: 20rpx;
 		  border-radius: 40rpx;
 		  color: #ffffff;
 		  font-weight: bold;
+		  background: url('/static/confirm/undo.png') no-repeat center center;
+		  background-size: contain;
 	 }
 	 .active {
 		background: url('/static/confirm/do.png') no-repeat center center;
