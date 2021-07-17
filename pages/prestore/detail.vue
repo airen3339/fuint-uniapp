@@ -6,9 +6,14 @@
 		</view>
 		<view class="coupon-title">
 		  <view class="name">{{ detail.name }}</view>
-		  <view v-if="detail.amount > 0" class="price"><span class="label">面额：</span>￥{{ detail.amount }}</view>
-		  <view v-if="detail.type == 'P'" class="balance"><span class="label">余额：</span>￥{{ detail.balance }}</view>
+		  <view v-if="detail.amount > 0" class="price">
+		      <view class="label">面额：<span class="amount">￥{{ detail.amount }}</span></view>
+		  </view>
+		  <view v-if="detail.type == 'P'" class="balance">
+			  <view class="label">余额：<span class="amount">￥{{ detail.amount }}</span></view>
+		  </view>
 		  <view class="time">有效期：{{ detail.effectiveDate }}</view>
+		  <view class="gift" @click="give()"><text>转赠好友</text></view>
 		</view>
 	</view>
     <view class="coupon-qr">
@@ -26,6 +31,11 @@
     </view>
     <!-- 快捷导航 -->
     <shortcut />
+	<view class="give-popup">
+	   <uni-popup ref="givePopup" type="dialog">
+		  <uni-popup-dialog mode="input" title="转赠给好友" type="info" placeholder="输入好友手机号码" :before-close="true" @close="cancelGive" @confirm="doGive"></uni-popup-dialog>
+	   </uni-popup>
+	</view>
   </view>
 </template>
 
@@ -33,6 +43,7 @@
   import jyfParser from '@/components/jyf-parser/jyf-parser'
   import Shortcut from '@/components/shortcut'
   import * as myCouponApi from '@/api/myCoupon'
+  import * as giveApi from '@/api/give'
 
   export default {
     components: {
@@ -61,7 +72,6 @@
     },
 
     methods: {
-
       // 获取卡券详情
       getCouponDetail() {
         const app = this
@@ -70,8 +80,43 @@
             app.detail = result.data
           })
           .finally(() => app.isLoading = false)
-      }
-
+      },
+	  // 转赠
+	  give() {
+	  		this.$refs.givePopup.open('top')
+	  },
+	  cancelGive() {
+	  		this.$refs.givePopup.close()
+	  },
+	  doGive(friendMobile) {
+	  		const app = this
+	  		if (friendMobile.length < 11) {
+	  		   app.$error("请先输入好友手机号码！")
+	  		   return false
+	  		} else {
+	  			app.$refs.givePopup.close()
+	  			const param = {'mobile': friendMobile,
+	  			               'couponId': this.userCouponId,
+	  						   'message': '转赠一张优惠券给你'}
+	  			giveApi.doGive(param)
+	  			  .then(result => {
+	  				  if (result.code == '200') {
+	  					  uni.showModal({
+	  					    title: '提示信息',
+	  					    content: '恭喜，转增成功！',
+	  						showCancel: false,
+	  					    success(o) {
+	  					      if (o.confirm) {
+	  					         uni.navigateBack()
+	  					      }
+	  					    }
+	  					  })
+	  				  } else {
+	  					app.$error(result.message)
+	  				  }
+	  			})
+	  		}
+	  }
     }
   }
 </script>
@@ -87,7 +132,7 @@
   	  padding: 30rpx;
   	  border-radius: 10rpx;
   	  margin: 20rpx;
-  	  height: 270rpx;
+  	  min-height: 290rpx;
   	  .coupon-image {
   		  float: left;
   		  margin-top: 10rpx;
@@ -110,11 +155,18 @@
 			 margin-top:10rpx;
 			 color:#666;
 			 font-size: 25rpx;
+			 .amount {
+			 	color: #f03c3c;
+			 	font-weight: bold;
+			 }
 		  }
 		  .balance {
 			  margin-top:10rpx;
-			  color:#f9211c;
 			  font-size:25rpx;
+			  .amount {
+			  	color: #f03c3c;
+			  	font-weight: bold;
+			  }
 		  }
 		  .time {
 			 margin-top: 10rpx;
@@ -157,5 +209,23 @@
 	.title {
 		margin-bottom: 15rpx;
 	}
+  }
+  .gift {
+    height: 46rpx;
+    width: 120rpx;
+  	margin-top: 20rpx;
+    line-height: 46rpx;
+    text-align: center;
+    border: 1px solid #f8df00;
+    border-radius: 6rpx;
+    color: #f86d48;
+    background: #f8df98;
+    font-size: 22rpx;
+  	float: right;
+    &.state {
+      border: none;
+  	  color: #cccccc;
+  	  background: #F5F5F5;
+    }
   }
 </style>

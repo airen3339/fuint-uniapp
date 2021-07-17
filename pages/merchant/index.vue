@@ -176,7 +176,6 @@
     },
 
     methods: {
-
       // 获取页面数据
       getPageData(callback) {
         const app = this

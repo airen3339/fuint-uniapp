@@ -10,7 +10,7 @@
 	  <view class="goods-list">
 		  <view class="goods-item" v-for="(item, index) in list.content" :key="index">
 			<!-- 单列卡券 -->
-			<view class="dis-flex">
+			<view class="dis-flex" @click="onDetail(item.id, item.type)">
 			    <!-- 卡券图片 -->
 			    <view class="goods-item_left">
 			      <image class="image" :src="item.image"></image>
@@ -32,16 +32,6 @@
 							  </view>
 							  <view v-if="item.amount > 0" class="desc_footer">
 								<text class="price_x">¥{{ item.amount }}</text>
-							  </view>
-						  </view>
-						  <view class="attr-r">
-							  <!--领券按钮-->
-							  <view v-if="item.canUse" class="receive" @click="onDetail(item.id, item.type)">
-								<text v-if="item.type == CouponTypeEnum.T.key">立即打卡</text>
-								<text v-else>立即使用</text>
-							  </view>
-							  <view v-if="!item.canUse" class="receive state">
-								<text>不可使用</text>
 							  </view>
 						  </view>
 			        </view>
@@ -260,24 +250,7 @@
     width: 400rpx;
     font-size: 24rpx;
     color: #e49a3d;
-  }
-  .receive {
-    height: 46rpx;
-    width: 128rpx;
-    line-height: 46rpx;
-    text-align: center;
-    border: 1px solid #f8df00;
-    border-radius: 20rpx;
-    color: #f86d48;
-    background: #f8df98;
-    font-size: 22rpx;
-    &.state {
-      border: none;
-  	color: #cccccc;
-  	background: #F5F5F5;
-    }
-  }
-  
+  }  
   .desc-goods_sales {
     color: #999;
     font-size: 24rpx;

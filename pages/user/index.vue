@@ -103,7 +103,7 @@
           </view>
         </block>
 		<block>
-		  <view v-if="isMerchant == true" class="service-item" @click="handleService({'url': 'pages/confirm/doConfirm?id=110'})">
+		  <view v-if="isMerchant == true" class="service-item" @click="handleService({'url': 'pages/merchant/index'})">
 		    <view class="item-icon">
 		      <text class="iconfont icon-dianpu"></text>
 		    </view>
@@ -135,7 +135,7 @@
    */
   const service = [
 	{ id: 'myCoupon', name: '我的卡券', icon: 'youhuiquan', type: 'link', url: 'pages/my-coupon/index' },
-    { id: 'coupon', name: '卡券转赠', icon: 'lingquan', type: 'link', url: 'pages/give/index' },
+    { id: 'coupon', name: '转赠记录', icon: 'lingquan', type: 'link', url: 'pages/give/index' },
 	{ id: 'points', name: '我的积分', icon: 'jifen', type: 'link', url: 'pages/points/detail' },
     { id: 'help', name: '我的帮助', icon: 'bangzhu', type: 'link', url: 'pages/help/index' },
     { id: 'contact', name: '在线客服', icon: 'kefu', type: 'button', openType: 'contact' },

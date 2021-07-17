@@ -181,7 +181,7 @@
       const app = this
       // 构建页面参数
       const params = app.$getShareUrlParams({
-        couponId: app.couponId,
+        couponId: app.couponId
       })
       return {
         title: app.couponInfo.name,
