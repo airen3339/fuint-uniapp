@@ -81,5 +81,9 @@
     },
     "uniStatistics" : {
         "enable" : false
+    },
+    "h5" : {
+        "title" : "FuInt会员营销系统",
+        "domain" : "www.fuint.cn"
     }
 }
