@@ -342,8 +342,7 @@
       handleTargetDetail(orderId) {
         this.$navTo('pages/order/detail', { orderId })
       }
-
-    },
+    }
 
   }
 </script>

@@ -7,7 +7,10 @@
           <view class="item-image">
             <image class="image" mode="widthFix" :src="dataItem.imgUrl"></image>
           </view>
-          <view class="item-text onelist-hidden">{{ dataItem.text }}</view>
+          <view class="item-text onelist-hidden">
+		     <view class="text">{{ dataItem.text }}</view>
+			 <view class="tip">{{ dataItem.tip }}</view>
+		  </view>
         </view>
       </view>
     </view>
@@ -54,34 +57,50 @@
 
   .item-nav {
     float: left;
-    margin: 10px 0;
+    margin: 5rpx 0px 5rpx 0px;
     text-align: center;
-	.nav-to{
-		border: 3rpx solid #e8e8e8;
-		box-shadow: 5rpx 5rpx 5rpx 5rpx rgba(0.05, 0.05, 0.05, 0.05);
-		margin: 10rpx;
-		padding: 10rpx;
+	background: #ffffff;
+	padding: 2rpx;
+	color: #666666;
+	.nav-to {
+		border: 2rpx solid #00acac;
+		margin: 0rpx 2px 0px 2px;
+		padding: 20rpx 10rpx 10rpx 10rpx;
 		border-radius: 8rpx;
+		background: #ffffff;
+		height: 120rpx;
 	}
 
     .item-text {
-      font-size: 25rpx;
+	  text-align: left;
+	  padding-left: 20rpx;
+	  .text {
+		  font-size: 30rpx;
+	  }
+	  .tip {
+		  font-size: 20rpx;
+		  margin-top: 6rpx;
+		  color: #999;
+	  }
     }
 
     .item-image {
       margin-bottom: 4px;
       font-size: 0;
+	  margin-left: 30rpx;
+	  width: 88rpx;
+	  height: 88rpx;
+	  float: left;
     }
 
     .item-image .image {
-      width: 88rpx;
-      height: 88rpx;
+      width: 80rpx;
+      height: 80rpx;
     }
 
   }
 
   /* 分列布局 */
-
   .diy-navBar .avg-sm-3>.item-nav {
     width: 33.33333333%;
   }
@@ -90,7 +109,7 @@
     width: 25%;
   }
 
-  .diy-navBar .avg-sm-5>.item-nav {
-    width: 20%;
+  .diy-navBar .avg-sm-2>.item-nav {
+    width: 50%;
   }
 </style>

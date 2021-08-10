@@ -44,6 +44,12 @@
             <view class="detail-btn btn-detail" @click.stop="handleTargetDetail(item.order_refund_id)">查看详情</view>
           </view>
         </view>
+		
+		<empty v-if="!list.content.length" :isLoading="isLoading" :custom-style="{ padding: '180rpx 50rpx' }" tips="您没有售后订单, 去逛逛吧">
+		  <view slot="slot" class="empty-ipt" @click="onTargetIndex">
+		    <text>去逛逛</text>
+		  </view>
+		</empty>
       </view>
 
     </mescroll-body>
@@ -54,6 +60,7 @@
 <script>
   import MescrollBody from '@/components/mescroll-uni/mescroll-body.vue'
   import MescrollMixin from '@/components/mescroll-uni/mescroll-mixins'
+  import Empty from '@/components/empty'
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
   import * as RefundApi from '@/api/refund'
 
@@ -71,13 +78,16 @@
 
   export default {
     components: {
-      MescrollBody
+      MescrollBody,
+	  Empty
     },
     mixins: [MescrollMixin],
     data() {
       return {
         // 订单列表数据
         list: getEmptyPaginateObj(),
+		// 正在加载
+		isLoading: false,
         // tabs栏数据
         tabs,
         // 当前标签索引
@@ -92,7 +102,7 @@
           noMoreSize: 2,
           // 空布局
           empty: {
-            tip: '亲，暂无售后单记录'
+            tip: '亲，暂无售后记录'
           }
         },
         // 控制首次触发onShow事件时不刷新列表
@@ -141,8 +151,8 @@
           RefundApi.list({ state: app.getTabValue(), page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
-              const newList = result.data.list
-              app.list.data = getMoreListData(newList, app.list, pageNo)
+              const newList = result.data
+              app.list.content = getMoreListData(newList, app.list, pageNo)
               resolve(newList)
             })
         })
@@ -174,6 +184,11 @@
       handleTargetDetail(orderRefundId) {
         this.$navTo('pages/refund/detail', { orderRefundId })
       },
+	  
+	  // 点击跳转到首页
+	  onTargetIndex() {
+	    this.$navTo('pages/user/index')
+	  }
 
     }
   }
@@ -259,5 +274,17 @@
         }
       }
     }
+  }
+  // 空数据按钮
+  .empty-ipt {
+    width: 220rpx;
+    margin: 10px auto;
+    font-size: 28rpx;
+    height: 64rpx;
+    line-height: 64rpx;
+    text-align: center;
+    color: #fff;
+    border-radius: 50rpx;
+    background: linear-gradient(to right, #00acac, #00acac);
   }
 </style>

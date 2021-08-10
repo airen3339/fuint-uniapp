@@ -58,19 +58,29 @@
 						"imgUrl": "/static/nav/1.png",
 						"imgName": "icon-1.png",
 						"linkUrl": "pages\/coupon\/list?type=C",
-						"text": "优惠券",
+						"text": "扫码支付",
+						"tip": "支付攒积分",
 						"color": "#666666"
 					}, {
 						"imgUrl": "/static/nav/3.png",
 						"imgName": "icon-1.png",
 						"linkUrl": "pages\/coupon\/list?type=P",
-						"text": "预存卡",
+						"text": "积分兑换",
+						"tip": "积分有好礼",
 						"color": "#666666"
 					}, {
 						"imgUrl": "/static/nav/2.png",
 						"imgName": "icon-1.png",
+						"linkUrl": "pages\/coupon\/list?type=P",
+						"text": "充值赠送",
+						"tip": "充值有优惠",
+						"color": "#666666",
+					}, {
+						"imgUrl": "/static/nav/4.png",
+						"imgName": "icon-1.png",
 						"linkUrl": "pages\/coupon\/list?type=T",
-						"text": "集次卡",
+						"text": "等级特权",
+						"tip": "升级有特权",
 						"color": "#666666"}],
 			"goodsStyle": {
 				"background": "#F6F6F6",
@@ -95,7 +105,7 @@
 			},
 			"navStyle": {
 				"background": "#ffffff",
-				"rowsNum": "3",
+				"rowsNum": "2",
 			}
 		},
         banner: [],

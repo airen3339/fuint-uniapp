@@ -217,4 +217,8 @@
   	  background: #F5F5F5;
     }
   }
+  .give-popup {
+	  border: #cccccc solid 1px;
+	  background: red;
+  }
 </style>
