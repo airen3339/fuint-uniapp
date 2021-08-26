@@ -103,12 +103,6 @@
           </view>
         </block>
 		<block>
-		  <view v-if="isMerchant == true" class="service-item" @click="handleService({'url': 'pages/merchant/index'})">
-		    <view class="item-icon">
-		      <text class="iconfont icon-dianpu"></text>
-		    </view>
-		    <view class="item-name">商户管理</view>
-		  </view>
 		</block>
       </view>
     </view>
@@ -160,7 +154,6 @@
         // 当前用户信息
         userInfo: {},
 		gradeInfo: {},
-		isMerchant: false,
         // 账户资产
         assets: { prestore: '--', timer: '--', coupon: '--' },
         // 我的服务
@@ -243,10 +236,8 @@
             .then(result => {
               app.userInfo = result.data.userInfo
 			  app.gradeInfo = result.data.gradeInfo
-			  app.isMerchant = result.data.isMerchant
               resolve(app.userInfo)
 			  resolve(app.gradeInfo)
-			  resolve(isMerchant)
             })
             .catch(err => {
               if (err.result && err.result.status == 401) {

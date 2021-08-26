@@ -1,36 +1,74 @@
 <template>
   <view class="container">
-    <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ use: false }" :up="upOption"
-      @up="upCallback">
-      <view class="log-list">
-        <view v-for="(item, index) in list.content" :key="index" class="log-item">
-          <view class="item-left flex-box">
-            <view class="rec-status">
-              <text>{{ item.couponNames }}</text>
-            </view>
-            <view class="rec-time">
-              <text>{{ timeStamp(item.createTime) }}</text>
+    <mescroll-body ref="mescrollRef" :sticky="true" @init="mescrollInit" :down="{ native: true }" @down="downCallback"
+      :up="upOption" @up="upCallback">
+
+      <!-- tab栏 -->
+      <u-tabs :list="tabs" :is-scroll="false" :current="curTab" active-color="#FA2209" :duration="0.2"
+        @change="onChangeTab" />
+
+      <!-- 转赠记录 -->
+      <view class="widget-list">
+        <view class="widget-detail" v-for="(item, index) in list.content" :key="index">
+          <view class="row-block dis-flex flex-y-center">
+            <view class="flex-box">{{ item.createTime }}</view>
+            <view class="flex-box t-r">
+              <text class="mobile">{{ item.mobile.substr(0, 3) + '****' + item.mobile.substr(7) }}</text>
             </view>
           </view>
-          <view class="item-right" :class="[item.money > 0 ? 'col-green' : 'col-6']">
-            <text>{{ item.money > 0 ? '+' : '' }}{{ item.money }}</text>
+          <view class="detail-goods row-block dis-flex">
+            <view class="goods-right flex-box">
+              <view class="goods-name">
+                <text class="twolist-hidden">{{ item.couponNames }}</text>
+              </view>
+              <view class="goods-props clearfix">
+                <view class="goods-props-item">
+                  <text>￥{{ item.money }}</text>
+                </view>
+              </view>
+              <view class="goods-num t-r">
+                <text class="f-26 col-8">×{{ item.num }}</text>
+              </view>
+            </view>
+          </view>
+          <view class="detail-order row-block">
+            <view class="item dis-flex flex-x-end flex-y-center">
+              <text class="">转赠总金额：</text>
+              <text class="col-m">￥{{ item.money * item.num }}</text>
+            </view>
           </view>
         </view>
-		<empty v-if="!list.content.length" :isLoading="isLoading" :custom-style="{ padding: '180rpx 50rpx' }" tips="暂时没有转赠记录">
+		
+		<empty v-if="!list.content.length" :isLoading="isLoading" :custom-style="{ padding: '180rpx 50rpx' }" tips="您没有转赠记录, 去逛逛吧">
+		  <view slot="slot" class="empty-ipt" @click="onTargetIndex">
+		    <text>去逛逛</text>
+		  </view>
 		</empty>
       </view>
+
     </mescroll-body>
+
   </view>
 </template>
 
 <script>
   import MescrollBody from '@/components/mescroll-uni/mescroll-body.vue'
   import MescrollMixin from '@/components/mescroll-uni/mescroll-mixins'
-  import * as giveApi from '@/api/give'
-  import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
   import Empty from '@/components/empty'
+  import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
+  import * as giveApi from '@/api/give'
 
+  // 每页记录数量
   const pageSize = 15
+
+  // tab栏数据
+  const tabs = [{
+    name: '收到',
+    value: 'gived'
+  }, {
+    name: '赠出',
+    value: 'give'
+  }]
 
   export default {
     components: {
@@ -40,30 +78,46 @@
     mixins: [MescrollMixin],
     data() {
       return {
-        // 数据记录
+        // 订单列表数据
         list: getEmptyPaginateObj(),
 		// 正在加载
 		isLoading: false,
+        // tabs栏数据
+        tabs,
+        // 当前标签索引
+        curTab: 0,
         // 上拉加载配置
         upOption: {
           // 首次自动执行
           auto: true,
           // 每页数据的数量; 默认10
           page: { size: pageSize },
-          // 数量要大于12条才显示无更多数据
-          noMoreSize: 12,
+          // 数量要大于2条才显示无更多数据
+          noMoreSize: 2,
           // 空布局
           empty: {
-            tip: '亲，暂无相关数据'
+            tip: '亲，暂无转赠记录'
           }
-        }
+        },
+        // 控制首次触发onShow事件时不刷新列表
+        canReset: false,
       }
     },
 
     /**
      * 生命周期函数--监听页面加载
      */
-    onLoad(options) {},
+    onLoad(options) {
+
+    },
+
+    /**
+     * 生命周期函数--监听页面显示
+     */
+    onShow() {
+      this.canReset && this.onRefreshList()
+      this.canReset = true
+    },
 
     methods: {
 
@@ -75,20 +129,20 @@
       upCallback(page) {
         const app = this
         // 设置列表数据
-        app.getLogList(page.num)
+        app.getGiveLogList(page.num)
           .then(list => {
             const curPageLen = list.data.length
-            const totalSize = list.data.totalPages
+            const totalSize = list.data.total
             app.mescroll.endBySize(curPageLen, totalSize)
           })
           .catch(() => app.mescroll.endErr())
       },
 
       // 获取转赠列表
-      getLogList(pageNo = 1) {
+      getGiveLogList(pageNo = 1) {
         const app = this
         return new Promise((resolve, reject) => {
-          giveApi.giveLog({ page: pageNo })
+          giveApi.giveLog({ type: app.getTabValue(), page: pageNo }, { load: false })
             .then(result => {
               // 合并新数据
               const newList = result.data
@@ -97,54 +151,118 @@
             })
         })
       },
-	  timeStamp: function(value) {
-		  var date = new Date(value);
-		  var year = date.getFullYear();
-		  var month = ("0" + (date.getMonth() + 1)).slice(-2);
-		  var sdate = ("0" + date.getDate()).slice(-2);
-		  var hour = ("0" + date.getHours()).slice(-2);
-		  var minute = ("0" + date.getMinutes()).slice(-2);
-		  var second = ("0" + date.getSeconds()).slice(-2);
-		  // 拼接
-		  var result = year + "." + month + "." + sdate + " " + hour + ":" + minute //+ ":" + second;
-		  // 返回
-		  return result;
+
+      // 切换标签项
+      onChangeTab(index) {
+        const app = this
+        // 设置当前选中的标签
+        app.curTab = index
+        // 刷新列表
+        app.onRefreshList()
+      },
+
+      // 刷新订单列表
+      onRefreshList() {
+        this.list = getEmptyPaginateObj()
+        setTimeout(() => {
+          this.mescroll.resetUpScroll()
+        }, 120)
+      },
+
+      // 获取当前标签项的值
+      getTabValue() {
+        return this.tabs[this.curTab].value
+      },
+	  
+	  // 点击跳转到首页
+	  onTargetIndex() {
+	    this.$navTo('pages/user/index')
 	  }
+
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  .container {
+  .widget-detail {
+    box-sizing: border-box;
     background: #fff;
-  }
+    margin-bottom: 20rpx;
+	border: solid 1px #cccccc;
+	padding: 16rpx;
 
-  .log-list {
-    padding: 0 30rpx;
-  }
+    .row-block {
+      padding: 0 20rpx;
+      min-height: 70rpx;
+    }
 
-  .log-item {
-    font-size: 28rpx;
-    padding: 20rpx 20rpx;
-    line-height: 1.8;
-    border-bottom: 1rpx solid rgb(238, 238, 238);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+    .detail-goods {
+      padding: 20rpx;
 
-  .rec-status {
-    color: #333;
+      .goods-right {
+        padding: 15rpx 0;
+      }
+	  .mobile {
+		color: #888888;  
+	  }
 
-    .rec-time {
-      color: rgb(160, 160, 160);
+      .goods-name {
+        margin-bottom: 10rpx;
+		font-weight: bold;
+      }
+
+
+      .goods-props {
+        margin-top: 14rpx;
+        height: 40rpx;
+        color: #ababab;
+        font-size: 24rpx;
+        overflow: hidden;
+
+        .goods-props-item {
+          display: inline-block;
+          margin-right: 14rpx;
+          padding: 4rpx 16rpx;
+          border-radius: 12rpx;
+          background-color: #F5F5F5;
+          width: auto;
+        }
+      }
+
+    }
+
+    .detail-operate {
+      padding-bottom: 20rpx;
+
+      .detail-btn {
+        border-radius: 4px;
+        border: 1rpx solid #ccc;
+        padding: 8rpx 20rpx;
+        font-size: 28rpx;
+        color: #555;
+        margin-left: 10rpx;
+      }
+    }
+
+    .detail-order {
+      padding: 10rpx 20rpx;
       font-size: 26rpx;
+      line-height: 50rpx;
+      height: 50rpx;
+
+      .item {
+        margin-bottom: 10rpx;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
     }
   }
   // 空数据按钮
   .empty-ipt {
     width: 220rpx;
-    margin: 10rpx auto;
+    margin: 10px auto;
     font-size: 28rpx;
     height: 64rpx;
     line-height: 64rpx;

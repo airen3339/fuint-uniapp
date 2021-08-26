@@ -84,6 +84,9 @@
     },
     "h5" : {
         "title" : "FuInt会员营销系统",
-        "domain" : "www.fuint.cn"
+        "domain" : "www.fuint.cn",
+        "router" : {
+            "base" : "/h5/"
+        }
     }
 }
