@@ -8,10 +8,8 @@
     <view class="auth-title">申请获取以下权限</view>
     <view class="auth-subtitle">获得你的公开信息（昵称、头像等）</view>
     <view class="login-btn">
-      <!-- 获取微信用户信息（旧版已弃用） -->
-      <!-- <button class="button btn-normal" open-type="getUserInfo" lang="zh_CN" @getuserinfo="getUserInfo">授权登录</button> -->
-      <!-- 获取微信用户信息（新版） -->
       <button class="button btn-normal" @click.stop="getUserProfile">授权登录</button>
+	  <!--<button class="button btn-normal" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">授权登录</button>-->
     </view>
     <view class="no-login-btn">
       <button class="button btn-normal" @click="handleCancel">暂不登录</button>
@@ -46,7 +44,7 @@
           uni.login({
             provider: 'weixin',
             success: res => {
-              console.log('code', res.code)
+              console.log('res', res)
               resolve(res.code)
             },
             fail: reject
@@ -54,7 +52,7 @@
         })
       },
 
-      // 获取微信用户信息(新版)
+      // 获取微信用户信息
       getUserProfile() {
         const app = this
         wx.canIUse('getUserProfile') && wx.getUserProfile({
@@ -63,6 +61,7 @@
           success({ userInfo }) {
             console.log('用户同意了授权')
             console.log('userInfo：', userInfo)
+			userInfo.type = "profile"
             // 授权成功事件
             app.onAuthSuccess(userInfo)
           },
@@ -71,7 +70,14 @@
           }
         })
       },
-
+	  
+	  // 获取微信绑定的手机号
+	  getPhoneNumber(e) {
+		  if (e.detail.errMsg == "getPhoneNumber:ok") {
+		     this.onAuthSuccess({"type": "phone", "encryptedData": e.detail.encryptedData, "iv": e.detail.iv, "sessionKey": e.detail.iv})
+		  }
+	  },
+	  
       // 授权成功事件
       // 这里分为两个逻辑:
       // 1.将code和userInfo提交到后端，如果存在该用户 则实现自动登录，无需再填写手机号
@@ -81,7 +87,7 @@
         // 提交到后端
         store.dispatch('MpWxLogin', { code: await app.getCode(), userInfo })
           .then(result => {
-            // 显示登录成功
+			// 显示登录成功
             app.$toast(result.message)
             // 跳转回原页面
             setTimeout(() => {
@@ -104,20 +110,6 @@
           userInfo // 微信用户信息
         })
       },
-
-      // /**
-      //  * 授权登录（旧版弃用）
-      //  */
-      // getUserInfo(e) {
-      //   const app = this
-      //   if (e.detail.errMsg === 'getUserInfo:ok') {
-      //     app.$emit('success', {
-      //       oauth: 'MP-WEIXIN', // 第三方登录类型: MP-WEIXIN
-      //       code: app.code, // 微信登录的code, 用于换取openid
-      //       userInfo: JSON.parse(e.detail.rawData) // 微信用户信息
-      //     })
-      //   }
-      // },
 
       /**
        * 暂不登录

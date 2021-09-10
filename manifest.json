@@ -1,5 +1,5 @@
 {
-    "name" : "FuInt会员营销系统",
+    "name" : "Fuint会员营销系统",
     "appid" : "__UNI__601AA10",
     "description" : "FuInt会员营销系统",
     "versionName" : "2.0.0",
@@ -17,7 +17,9 @@
             "delay" : 0
         },
         /* 模块配置 */
-        "modules" : {},
+        "modules" : {
+            "Payment" : {}
+        },
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */
@@ -48,10 +50,24 @@
                 "autoSdkPermissions" : true
             },
             /* ios打包配置 */
-            "ios" : {},
+            "ios" : {
+                "capabilities" : {
+                    "entitlements" : {
+                        "com.apple.developer.associated-domains" : [ "applinks:static-5ada423c-7a73-43cd-a106-dea1d6af22d2.bspapp.com" ]
+                    }
+                }
+            },
             /* SDK配置 */
             "sdkConfigs" : {
-                "ad" : {}
+                "ad" : {},
+                "share" : {},
+                "payment" : {
+                    "weixin" : {
+                        "__platform__" : [ "ios", "android" ],
+                        "appid" : "wxb6af3741686162bc",
+                        "UniversalLinks" : "https://static-5ada423c-7a73-43cd-a106-dea1d6af22d2.bspapp.com/uni-universallinks/__UNI__601AA10"
+                    }
+                }
             },
             "splashscreen" : {
                 "iosStyle" : "common"
@@ -62,10 +78,11 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx3ea3e177ed20ed31",
+        "appid" : "wxb6af3741686162bc",
         "setting" : {
             "urlCheck" : false,
-            "es6" : false
+            "es6" : false,
+            "minified" : true
         },
         "usingComponents" : true,
         "permission" : {}
@@ -88,5 +105,6 @@
         "router" : {
             "base" : "/h5/"
         }
-    }
+    },
+    "_spaceID" : "5ada423c-7a73-43cd-a106-dea1d6af22d2"
 }

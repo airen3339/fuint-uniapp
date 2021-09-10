@@ -139,13 +139,13 @@
 	  },
 	  
 	  // 卡券详情
-	  onDetail(id, type) {
+	  onDetail(userCouponId, type) {
 		  if (type === 'C') {
-			  this.$navTo(`pages/coupon/detail`, { id })
+			  this.$navTo(`pages/coupon/detail`, { userCouponId })
 		  } else if(type === 'T'){
-		      this.$navTo(`pages/timer/detail`, { id })
+		      this.$navTo(`pages/timer/detail`, { userCouponId })
 		  } else if(type === 'P') {
-			  this.$navTo(`pages/prestore/detail`, { id })
+			  this.$navTo(`pages/prestore/detail`, { userCouponId })
 		  }
 	  },
 	  

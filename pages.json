@@ -21,8 +21,7 @@
       "path": "pages/index/index",
       "style": {
 		"navigationBarTitleText": "首页",
-        "enablePullDownRefresh": true,
-		"navigationStyle": "custom"
+        "enablePullDownRefresh": true
       }
     },
     {
@@ -35,8 +34,7 @@
       "path": "pages/user/index",
       "style": {
         "navigationBarTitleText": "会员中心",
-        "enablePullDownRefresh": true,
-		"navigationStyle": "custom"
+        "enablePullDownRefresh": true
       }
     },
 	{
@@ -78,13 +76,13 @@
 	{
 	  "path": "pages/coupon/detail",
 	  "style": {
-	    "navigationBarTitleText": "使用优惠券"
+	    "navigationBarTitleText": "优惠券详情"
 	  }
 	},
 	{
 	  "path": "pages/timer/detail",
 	  "style": {
-	    "navigationBarTitleText": "集次卡打卡",
+	    "navigationBarTitleText": "集次卡详情",
 		"enablePullDownRefresh": true
 	  }
 	},
@@ -98,7 +96,7 @@
 	{
 	  "path": "pages/prestore/detail",
 	  "style": {
-	    "navigationBarTitleText": "预存卡刷卡",
+	    "navigationBarTitleText": "预存卡详情",
 		"enablePullDownRefresh": true
 	  }
 	},
@@ -207,7 +205,13 @@
       "style": {
         "navigationBarTitleText": "申请售后"
       }
-    }
+    },
+	{
+	  "path": "pages/pay/index",
+	  "style": {
+	    "navigationBarTitleText": "向商家付款"
+	  }
+	}
   ],
   "globalStyle": {
     "navigationBarBackgroundColor": "#ffffff",

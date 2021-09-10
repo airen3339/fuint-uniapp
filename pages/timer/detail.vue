@@ -9,7 +9,7 @@
 		  <view class="time">有效期：{{ detail.effectiveDate }}</view>
 		</view>
 	</view>
-	<view class="coupon-timer">
+	<view v-if="dataList.length > 0" class="coupon-timer">
 	  <view class="tips">完成情况({{detail.confirmCount}}/{{detail.useRule}})</view>
 	  <uni-row class="time-row" v-for="row in dataList">
 	  	<uni-col :span="rowCount" v-for="item in row.data" class="time-item">
@@ -18,7 +18,7 @@
 	  	</uni-col>
 	  </uni-row>
 	</view>
-    <view class="coupon-qr">
+    <view v-if="detail.qrCode" class="coupon-qr">
       <view>
          <image class="image" :src="detail.qrCode"></image>
       </view>
@@ -33,6 +33,20 @@
     </view>
     <!-- 快捷导航 -->
     <shortcut />
+	
+	<!-- 底部选项卡 -->
+	<view v-if="!detail.code && !detail.isReceive" class="footer-fixed">
+	  <view class="footer-container">
+	    <!-- 操作按钮 -->
+	    <view class="foo-item-btn">
+	      <view class="btn-wrapper">
+	        <view class="btn-item btn-item-main" @click="receive(detail.id)">
+	          <text>参加集次</text>
+	        </view>
+	      </view>
+	    </view>
+	  </view>
+	</view>
   </view>
 </template>
 
@@ -42,6 +56,7 @@
   import Row from '@/components/oveui-layout/row/row.vue';
   import oCol from '@/components/oveui-layout/o-col/o-col.vue';
   import * as myCouponApi from '@/api/myCoupon'
+  import * as couponApi from '@/api/coupon'
 
   export default {
     components: {
@@ -66,9 +81,8 @@
      * 生命周期函数--监听页面加载
      */
     onLoad(options) {
-      // 记录ID
-      this.userCouponId = options.id
-      // 获取卡券详情
+      this.userCouponId = options.userCouponId ? options.userCouponId : 0
+      this.couponId = options.couponId ?options.couponId : 0
       this.getCouponDetail()
     },
 
@@ -77,7 +91,7 @@
       getCouponDetail() {
         const app = this
         app.isLoading = false
-        myCouponApi.detail(app.userCouponId)
+        myCouponApi.detail(app.couponId, app.userCouponId)
           .then(result => {
             app.detail = result.data
 			app.getRowCount(app.detail.useRule)
@@ -114,6 +128,19 @@
 		 } else if (num >= 4) {
 			 this.rowCount = 6
 		 }
+	  },
+	  receive(couponId) {
+		const app = this
+		couponApi.receive(couponId)
+		  .then(result => {
+			// 显示提示
+			if (parseInt(result.code) === 200) {
+				app.detail.isReceive = true
+				app.$success("领取成功！")
+			} else {
+				app.$error(result.message)
+			}
+		  })
 	  }
     }
   }
@@ -224,13 +251,55 @@
 		  }
 	  }
   }
-
   .coupon-content {
     font-size: 28rpx;
 	padding: 15rpx;
 	border: dashed 5rpx #cccccc;
 	border-radius: 5rpx;
 	margin: 20rpx;
-	min-height: 400rpx;
+	min-height: 450rpx;
+  }
+  
+  /* 底部操作栏 */
+  .footer-fixed {
+    position: fixed;
+    bottom: var(--window-bottom);
+    left: 0;
+    right: 0;
+    display: flex;
+    height: 96rpx;
+    z-index: 11;
+    box-shadow: 0 -4rpx 40rpx 0 rgba(144, 52, 52, 0.1);
+    background: #fff;
+  }
+  
+  .footer-container {
+    width: 100%;
+    display: flex;
+  }
+  
+  // 操作按钮
+  .foo-item-btn {
+    flex: 1;
+    .btn-wrapper {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .btn-item {
+      flex: 1;
+      font-size: 28rpx;
+      height: 72rpx;
+      line-height: 72rpx;
+      margin-right: 16rpx;
+  	  margin-left: 16rpx;
+      text-align: center;
+      color: #fff;
+      border-radius: 50rpx;
+    }
+    // 参与按钮
+    .btn-item-main {
+      background: linear-gradient(to right, #f9211c, #ff6335);
+    }
   }
 </style>

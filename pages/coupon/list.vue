@@ -28,7 +28,7 @@
 
     <!-- 卡券列表 -->
     <view class="goods-list clearfix" :class="['column-1']">
-      <view class="goods-item" v-for="(item, index) in list.content" :key="index" @click="onTargetDetail(item.id, item.type)">
+      <view class="goods-item" v-for="(item, index) in list.content" :key="index" @click="onTargetDetail(item.id, item.type, item.userCouponId)">
         <view class="dis-flex">
           <!-- 卡券图片 -->
           <view class="goods-item_left">
@@ -221,11 +221,15 @@
       },
 
       // 跳转详情页
-      onTargetDetail(couponId, type) {
+      onTargetDetail(couponId, type, userCouponId) {
         if (type === 'P') {
         	this.$navTo(`pages/prestore/buy`, { couponId })
         } else {
-            return
+            if (type === 'C') {
+            	this.$navTo(`pages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
+            } else if(type === 'T'){
+                this.$navTo(`pages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
+            }
         }
       },
 	  

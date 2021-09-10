@@ -178,7 +178,7 @@ export const wxPayment = (option) => {
       provider: 'wxpay',
       timeStamp: options.timeStamp,
       nonceStr: options.nonceStr,
-      'package': `prepay_id=${options.prepay_id}`,
+      'package': options.package,
       signType: 'MD5',
       paySign: options.paySign,
       success: res => resolve(res),

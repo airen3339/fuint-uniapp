@@ -164,7 +164,7 @@
         // 按钮禁用
         app.disabled = true
         // 请求api
-        SettlementApi.submit(this.couponId, this.selectNum, "prestore", this.remark)
+        SettlementApi.submit(this.couponId, this.selectNum, "prestore", this.remark, 0)
           .then(result => app.onSubmitCallback(result))
           .catch(err => {
             if (err.result) {
@@ -182,17 +182,18 @@
       onSubmitCallback(result) {
         const app = this
         // 发起微信支付
-        if (result.data.payType == PayTypeEnum.WECHAT.value && false) {
+        if (result.data.payType == PayTypeEnum.WECHAT.value) {
           wxPayment(result.data.payment)
             .then(() => app.$success('支付成功'))
-            .catch(err => app.$error('订单未支付'))
+            .catch(err => app.$error('支付失败'))
             .finally(() => {
               app.disabled = false
               app.navToMyOrder(result.data.orderInfo.id)
             })
         }
 		
-        if (true) {
+		// 余额支付
+        if (result.data.payType == PayTypeEnum.BALANCE.value) {
           app.$success('支付成功')
           app.disabled = false
           app.navToMyOrder(result.data.orderInfo.id)

@@ -10,10 +10,10 @@
 		      <view class="label">面额：<span class="amount">￥{{ detail.amount }}</span></view>
 		  </view>
 		  <view class="time">有效期：{{ detail.effectiveDate }}</view>
-		  <view class="gift" @click="give()"><text>转赠好友</text></view>
+		  <view v-if="detail.code" class="gift" @click="give()"><text>转赠好友</text></view>
 		</view>
 	</view>
-    <view class="coupon-qr">
+    <view class="coupon-qr" v-if="detail.code">
       <view>
          <image class="image" :src="detail.qrCode"></image>
       </view>
@@ -28,10 +28,23 @@
     </view>
     <!-- 快捷导航 -->
     <shortcut/>
-	<view class="give-popup">
+	<view class="give-popup" v-if="detail.qrCode">
 	   <uni-popup ref="givePopup" type="dialog">
-		  <uni-popup-dialog mode="input" title="转赠给好友" type="info" placeholder="输入好友手机号码" :before-close="true" @close="cancelGive" @confirm="doGive"></uni-popup-dialog>
+		  <uni-popup-dialog mode="input" focus="false" title="转赠给好友" type="info" placeholder="输入好友手机号码" :before-close="true" @close="cancelGive" @confirm="doGive"></uni-popup-dialog>
 	   </uni-popup>
+	</view>
+	<!-- 底部选项卡 -->
+	<view v-if="!detail.code && !detail.isReceive" class="footer-fixed">
+	  <view class="footer-container">
+	    <!-- 操作按钮 -->
+	    <view class="foo-item-btn">
+	      <view class="btn-wrapper">
+	        <view class="btn-item btn-item-main" @click="receive(detail.id)">
+	          <text>立即领取</text>
+	        </view>
+	      </view>
+	    </view>
+	  </view>
 	</view>
   </view>
 </template>
@@ -41,6 +54,7 @@
   import Shortcut from '@/components/shortcut'
   import * as myCouponApi from '@/api/myCoupon'
   import * as giveApi from '@/api/give'
+  import * as couponApi from '@/api/coupon'
 
   export default {
     components: {
@@ -49,7 +63,9 @@
     data() {
       return {
         // 当前会员卡券ID
-        userCouponId: null,
+        userCouponId: 0,
+		// 卡券ID
+		couponId: 0,
         // 加载中
         isLoading: true,
         // 当前卡券详情
@@ -62,9 +78,8 @@
      * 生命周期函数--监听页面加载
      */
     onLoad(options) {
-      // 记录ID
-      this.userCouponId = options.id
-      // 获取卡券详情
+      this.userCouponId = options.userCouponId ? options.userCouponId : 0
+	  this.couponId = options.couponId ?options.couponId : 0
       this.getCouponDetail()
     },
 
@@ -72,7 +87,7 @@
       // 获取卡券详情
       getCouponDetail() {
         const app = this
-        myCouponApi.detail(app.userCouponId)
+        myCouponApi.detail(app.couponId, app.userCouponId)
           .then(result => {
             app.detail = result.data
           })
@@ -113,6 +128,19 @@
 				  }
 			})
 		}
+	  },
+	  receive(couponId) {
+		const app = this
+		couponApi.receive(couponId)
+		  .then(result => {
+			// 显示提示
+			if (parseInt(result.code) === 200) {
+				app.detail.isReceive = true
+				app.$success("领取成功！")
+			} else {
+				app.$error(result.message)
+			}
+		  })
 	  }
     }
   }
@@ -188,7 +216,6 @@
 		  }
 	  }
   }
-
   .coupon-content {
     padding: 15rpx;
     border: dashed 5rpx #cccccc;
@@ -220,5 +247,49 @@
   .give-popup {
 	  border: #cccccc solid 1px;
 	  background: red;
+  }
+  
+  /* 底部操作栏 */
+  .footer-fixed {
+    position: fixed;
+    bottom: var(--window-bottom);
+    left: 0;
+    right: 0;
+    display: flex;
+    height: 96rpx;
+    z-index: 11;
+    box-shadow: 0 -4rpx 40rpx 0 rgba(144, 52, 52, 0.1);
+    background: #fff;
+  }
+  
+  .footer-container {
+    width: 100%;
+    display: flex;
+  }
+  
+  // 操作按钮
+  .foo-item-btn {
+    flex: 1;
+    .btn-wrapper {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+  
+    .btn-item {
+      flex: 1;
+      font-size: 28rpx;
+      height: 72rpx;
+      line-height: 72rpx;
+      margin-right: 16rpx;
+  	  margin-left: 16rpx;
+      text-align: center;
+      color: #fff;
+      border-radius: 50rpx;
+    }
+    // 立即领取按钮
+    .btn-item-main {
+      background: linear-gradient(to right, #f9211c, #ff6335);
+    }
   }
 </style>

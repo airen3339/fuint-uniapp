@@ -3,7 +3,7 @@
   <view class="diy-goods" :style="{ background: itemStyle.background }">
     <view class="goods-list" :class="[`display__${itemStyle.display}`, `column__${itemStyle.column}`]">
       <scroll-view :scroll-x="itemStyle.display === 'slide'">
-        <view class="goods-item" v-for="(dataItem, index) in dataList" :key="index" @click="onTargetCoupon(dataItem.id, dataItem.type)">
+        <view class="goods-item" v-for="(dataItem, index) in dataList" :key="index" @click="onTargetCoupon(dataItem.id, dataItem.type, dataItem.userCouponId)">
           <!-- 单列卡券 -->
           <block>
             <view class="dis-flex">
@@ -86,13 +86,17 @@
      */
     methods: {
       /**
-       * 跳转卡券详情页
+       * 卡券详情页
        */
-      onTargetCoupon(couponId, type) {
+      onTargetCoupon(couponId, type, userCouponId) {
 		  if (type === 'P') {
 			  this.$navTo(`pages/prestore/buy`, { couponId })
 		  } else {
-              return
+              if (type === 'C') {
+              	  this.$navTo(`pages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
+              } else if(type === 'T'){
+                  this.$navTo(`pages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
+              }
 		  }
       },
 	  receive(couponId) {

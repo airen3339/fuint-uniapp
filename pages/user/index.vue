@@ -24,7 +24,7 @@
 			<view class="amount-tip">余额（元）</view>
 			<view class="amount-num">{{ userInfo.balance.toFixed(2) }}</view>
 		</view>
-		<view class="pay-qr">
+		<view class="pay-qr" @click="toPay">
 			<view class="qrcode iconfont icon-qr-extract"></view>
 			<view class="topay">付款</view>
 		</view>
@@ -286,6 +286,11 @@
       handleLogin() {
         !this.isLogin && this.$navTo('pages/login/index')
       },
+	  
+	  // 跳转到支付页
+	  toPay() {
+	    this.$navTo('pages/pay/index')
+	  },
 
       // 跳转到订单页
       onTargetOrder(item) {
@@ -409,7 +414,7 @@
 	  .pay-qr {
 		  color:#ffffff;
 		  margin-top: 25rpx;
-		  margin-left: 120rpx;
+		  margin-left: 200rpx;
 		  text-align: center;
 		  .qrcode {
 			  display: block;

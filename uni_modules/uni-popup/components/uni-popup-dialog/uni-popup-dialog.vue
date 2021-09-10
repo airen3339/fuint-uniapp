@@ -112,7 +112,7 @@
 			}
 		},
 		mounted() {
-			this.focus = true
+			this.focus = false
 		},
 		methods: {
 			/**

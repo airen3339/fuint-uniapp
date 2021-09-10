@@ -66,7 +66,7 @@
      */
     onLoad(options) {
       // 记录ID
-      this.userCouponId = options.id
+      this.userCouponId = options.userCouponId
       // 获取卡券详情
       this.getCouponDetail()
     },
@@ -75,7 +75,7 @@
       // 获取卡券详情
       getCouponDetail() {
         const app = this
-        myCouponApi.detail(app.userCouponId)
+        myCouponApi.detail(0, app.userCouponId)
           .then(result => {
             app.detail = result.data
           })

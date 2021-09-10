@@ -51,7 +51,7 @@ const user = {
     // 微信小程序快捷登录
     MpWxLogin({ commit }, data) {
       return new Promise((resolve, reject) => {
-        LoginApi.mpWxLogin({ form: data }, { isPrompt: false })
+        LoginApi.mpWxLogin(data, { isPrompt: false })
           .then(response => {
             const result = response.data
             loginSuccess(commit, result)

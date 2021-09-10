@@ -57,16 +57,16 @@
 			"navBar": [{
 						"imgUrl": "/static/nav/1.png",
 						"imgName": "icon-1.png",
-						"linkUrl": "pages\/coupon\/list?type=C",
-						"text": "扫码支付",
+						"linkUrl": "pages\/pay\/index",
+						"text": "买单支付",
 						"tip": "支付攒积分",
 						"color": "#666666"
 					}, {
 						"imgUrl": "/static/nav/3.png",
 						"imgName": "icon-1.png",
-						"linkUrl": "pages\/coupon\/list?type=P",
+						"linkUrl": "pages\/coupon\/list?type=C",
 						"text": "积分兑换",
-						"tip": "积分有好礼",
+						"tip": "积分换好礼",
 						"color": "#666666"
 					}, {
 						"imgUrl": "/static/nav/2.png",

@@ -6,6 +6,6 @@ const api = {
 }
 
 // 结算台订单提交
-export const submit = (couponId, selectNum, type, remark) => {
-  return request.post(api.submit, { couponId, selectNum, type, remark})
+export const submit = (couponId, selectNum, type, remark, payAmount) => {
+  return request.post(api.submit, { couponId, selectNum, type, remark, payAmount})
 }
