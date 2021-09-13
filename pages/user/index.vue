@@ -114,7 +114,7 @@
   import SettingModel from '@/common/model/Setting'
   import * as UserApi from '@/api/user'
   import * as OrderApi from '@/api/order'
-  import { checkLogin } from '@/utils/app'
+  import { checkLogin, showMessage } from '@/utils/app'
 
   // 订单操作
   const orderNavbar = [
@@ -171,6 +171,10 @@
     onShow(options) {
       // 判断是否已登录
       this.isLogin = checkLogin()
+	  
+	  // 消息显示
+	  showMessage();
+	  
       // 获取页面数据
       this.getPageData()
     },

@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import { setCartTabBadge } from '@/utils/app'
+  import { setCartTabBadge, showMessage } from '@/utils/app'
   import Search from '@/components/page/search'
   import Banner from '@/components/page/banner'
   import NavBar from '@/components/page/navBar'
@@ -124,7 +124,7 @@
      * 生命周期函数--监听页面显示
      */
     onShow() {
-      // empty
+	  showMessage();
     },
 
     methods: {

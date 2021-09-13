@@ -1,6 +1,7 @@
 import store from '../store'
 import * as util from './util'
 import { paginate } from '@/common/constant'
+import * as MessageApi from '@/api/message'
 
 /**
  * 获取当前运行的终端(App H5 小程序)
@@ -208,4 +209,36 @@ export const getMoreListData = (resList, oldList, pageNo) => {
   if (pageNo == 1) oldList.content = []
   // 合并新数据
   return oldList.content.concat(resList.content)
+}
+
+/**
+ * 弹框消息
+ * @param {Object} 参数
+ */
+export const showMessage = () =>  {
+  const app = this
+  if (store.getters.userId.length < 1) {
+	  return false
+  }
+  return new Promise((resolve, reject) => {
+    MessageApi.getOne()
+      .then(result => {
+        if (result.data) {
+			uni.showModal({
+				title: result.data.title ? result.data.title : '友情提示',
+				content: result.data.content,
+				showCancel: false,
+				success(res) {
+				  if (res.confirm) {
+					// 将消息置为已读
+					MessageApi.readed({'msgId' : result.data.msgId})
+					  .then(result => {
+					    //empty
+					  })
+				  }
+				}
+			})
+		}
+      })
+  })
 }
