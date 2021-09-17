@@ -6,29 +6,25 @@
 		</view>
 	</view>
     <view class="pay-form">
-    	<u-form :model="form" label-width="180rpx">
-    	  <u-form-item class="input" left-icon="rmb-circle" prop="payAmount" label="支付金额" rules="[{ required: true, message: '请输入支付金额', trigger: 'blur' }]">
-    	    <u-input v-model="form.payAmount" type="digit" placeholder="请输入支付金额" />
+    	<u-form :model="form" label-width="100rpx">
+    	  <u-form-item class="input" prop="payAmount" :border-bottom="false" label="金额" rules="[{ required: true, message: '请输入支付金额', trigger: 'blur' }]">
+    	      <view class="amount-icon">￥</view><u-input class="amount" disabled="true" v-model="form.payAmount" type="digit" placeholder=" "/>
     	  </u-form-item>
-    	  <u-form-item class="input" left-icon="edit-pen" label="支付备注" :border-bottom="false">
-    	    <u-input v-model="form.remark" placeholder="不输入默认为空" />
-    	  </u-form-item>
+		  <u-form-item class="input" v-if="form.remark" :border-bottom="false" label="备注">
+		      <u-input v-model="form.remark" type="text" placeholder=""/>
+		  </u-form-item>
+		  <u-form-item :border-bottom="false">
+		      <view class="remark" @click="showRemarkPop()"><text class="iconfont icon-edit"></text>添加备注</view>
+		  </u-form-item>
     	</u-form>
     </view>
-    <!-- 快捷导航 -->
-    <shortcut/>
-	<!-- 底部选项卡 -->
-	<view class="footer-fixed">
-	  <view class="footer-container">
-	    <!-- 操作按钮 -->
-	    <view class="foo-item-btn">
-	      <view class="btn-wrapper">
-	        <view class="btn-item btn-item-main" @click="doPay()">
-	          <view :class="{ disabled }">立即支付</view>
-	        </view>
-	      </view>
-	    </view>
-	  </view>
+	
+	<neoceansoft-keyboard keyboardType="payment" behaviorBgColor="#00acac" @result="changeAmount" @paymentClick="doPay"></neoceansoft-keyboard>
+
+	<view class="remark-popup">
+	   <uni-popup ref="remarkPopup" type="dialog">
+		  <uni-popup-dialog mode="input" focus="false" v-model="form.remark" title="备注信息" type="info" placeholder="请输入备注信息" :before-close="true" @close="cancelRemark" @confirm="doRemark"></uni-popup-dialog>
+	   </uni-popup>
 	</view>
   </view>
 </template>
@@ -48,8 +44,7 @@
       return {
         // 加载中
         isLoading: true,
-		disabled : false,
-        form: {}
+        form: {'payAmount': '', 'remark' : ''}
       }
     },
 
@@ -57,25 +52,32 @@
      * 生命周期函数--监听页面加载
      */
     onLoad(options) {
-	  // empty
+	  //empty
     },
 
     methods: {
+	  showRemarkPop() {
+		this.$refs.remarkPopup.open('top')
+	  },
+	  doRemark(remark) {
+		this.form.remark = remark
+		this.$refs.remarkPopup.close()
+	  },
+	  cancelRemark() {
+		this.$refs.remarkPopup.close()
+	  },
+      // 支付金额改变
+      changeAmount(e) {
+		this.form.payAmount = e
+      },
 	  // 提交支付
 	  doPay() {
 	    const app = this
 		
-		if (!app.form.payAmount) {
+		if (app.form.payAmount.length < 1) {
 			app.$error('支付金额不能为空')
 			return false
 		}
-		
-		if (app.disabled) {
-		  return false
-		}
-
-	    // 按钮禁用
-	    app.disabled = true
 		
 	    // 请求api
 	    SettlementApi.submit(0, "", "payment", app.form.remark, app.form.payAmount)
@@ -83,12 +85,10 @@
 	      .catch(err => {
 	        if (err.result) {
 	          const errData = err.result.data
-	          if (errData.isCreated) {
-	            app.navToMyOrder(errData.orderInfo.id)
+	          if (errData) {
 	            return false
 	          }
 	        }
-	        app.disabled = false
 	      })
 	  },
 	  
@@ -99,22 +99,27 @@
 	    if (result.data.payType == PayTypeEnum.WECHAT.value) {
 	      wxPayment(result.data.payment)
 	        .then(() => {
-				app.$success('支付成功')
-				app.form.payAmount = ""
-				app.form.remark = ""
+				uni.showModal({
+				  title: '支付结果',
+				  content: '支付成功！',
+				  showCancel: false,
+				  success(o) {
+				    if (o.confirm) {
+				       app.form.payAmount = ""
+				       app.form.remark = ""
+				    }
+				  }
+				})
 			})
 	        .catch(err => app.$error('支付失败'))
 	        .finally(() => {
-	          app.disabled = false
-	          app.navToMyOrder(result.data.orderInfo.id)
+	          //empty
 	        })
 	    }
 	  	
 		// 余额支付
 	    if (result.data.payType == PayTypeEnum.BALANCE.value) {
-	      app.$success('支付成功')
-	      app.disabled = false
-	      app.navToMyOrder(result.data.orderInfo.id)
+	      app.$error('支付成功')
 	    }
 	  },
     }
@@ -148,14 +153,32 @@
   	padding: 30rpx;
   	border-radius: 10rpx;
   	margin: 60rpx 20rpx 20rpx 20rpx;
+	.remark-popup {
+		border: #cccccc solid 1px;
+		background: red;
+	}
   	.input {
   		padding-left: 20rpx;
+		padding-right: 20rpx;
 		margin-top: 30rpx;
   		margin-bottom: 20rpx;
   		border-radius: 10rpx;
-  		width: 98%;
+  		width: 94%;
+		border: dashed 1rpx #cccccc;
   		display: inline-flex;
   	}
+	.amount {
+		font-weight: bold;
+	}
+	.amount-icon {
+		font-size: 45rpx;
+		font-weight: bold;
+		float: left;
+	}
+	.remark {
+		width: 100%;
+		text-align: right;
+	}
   }
   
   /* 底部操作栏 */
