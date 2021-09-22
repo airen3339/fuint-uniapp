@@ -117,7 +117,7 @@
         couponInfo: null,
 		// 预存规则
 		storeRule: [],
-        // 显示/隐藏SKU弹窗
+        // 显示/隐藏弹窗
         showPopup: false
       }
     },

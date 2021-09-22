@@ -217,13 +217,13 @@ export const getMoreListData = (resList, oldList, pageNo) => {
  */
 export const showMessage = () =>  {
   const app = this
-  if (store.getters.userId.length < 1) {
+  if (!store.getters.userId) {
 	  return false
   }
   return new Promise((resolve, reject) => {
     MessageApi.getOne()
       .then(result => {
-        if (result.data) {
+        if (result.data.content) {
 			uni.showModal({
 				title: result.data.title ? result.data.title : '友情提示',
 				content: result.data.content,

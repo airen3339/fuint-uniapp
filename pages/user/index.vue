@@ -40,13 +40,40 @@
         </view>
       </view>
     </view>
+	
+	<!--会员升级 start-->
+	<view class="member-update">
+		<view class="update-title">
+			<text>会员升级</text>
+		</view>
+		<scroll-view scroll-x>
+			<view class="recharge">
+				<view class="recharge-item" :class="current == index ? 'recharge-item-active': ''" v-for="(item, index) in memberGrade" :key="index" :style="{marginLeft: !index ? '30rpx': ''}" @click="onShowPopup(index)">
+					<view class="recharge-tag">
+						<text class="recharge-tag-text" v-if="parseInt(item.validDay) > 0">{{ item.validDay }}天有效期</text>
+						<text class="recharge-tag-text" v-else>永久有效期</text>
+					</view>
+					<text class="recharge-item-duration">{{ item.name }}</text>
+					<view class="recharge-item-price">
+						<text class="rmb">￥</text>
+						<text class="recharge-item-price-text">{{ item.catchValue }}</text>
+					</view>
+					<text class="recharge-item-des" v-if="item.discount > 0">买单{{ item.discount }}折</text>
+					<text class="recharge-item-des" v-if="item.speedPoint > 0">积分翻{{ item.speedPoint }}倍</text>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+	<!-- 弹窗 -->
+	<Popup v-if="!isLoading" v-model="showPopup" :memberGrade="curGrade"/>
+	<!--会员升级 end-->
 
     <!-- 我的资产 -->
     <view class="my-asset">
       <view class="asset-left flex-box dis-flex flex-x-center">
         <view class="asset-left-item" @click="onTargetMyCoupon('C')">
           <view class="item-value dis-flex flex-x-center">
-            <text>{{ isLogin ? assets.coupon : '--' }}</text>
+            <text>{{ isLogin ? assets.coupon : '0' }}</text>
           </view>
           <view class="item-name dis-flex flex-x-center">
             <text>优惠券</text>
@@ -54,7 +81,7 @@
         </view>
         <view class="asset-left-item" @click="onTargetMyCoupon('P')">
           <view class="item-value dis-flex flex-x-center">
-            <text>{{ isLogin ? assets.prestore : '--' }}</text>
+            <text>{{ isLogin ? assets.prestore : '0' }}</text>
           </view>
           <view class="item-name dis-flex flex-x-center">
             <text>预存卡</text>
@@ -62,7 +89,7 @@
         </view>
         <view class="asset-left-item" @click="onTargetMyCoupon('T')">
           <view class="item-value dis-flex flex-x-center">
-            <text>{{ isLogin ? assets.timer : '--' }}</text>
+            <text>{{ isLogin ? assets.timer : '0' }}</text>
           </view>
           <view class="item-name dis-flex flex-x-center">
             <text>集次卡</text>
@@ -115,6 +142,7 @@
   import * as UserApi from '@/api/user'
   import * as OrderApi from '@/api/order'
   import { checkLogin, showMessage } from '@/utils/app'
+  import Popup from './components/Popup'
 
   // 订单操作
   const orderNavbar = [
@@ -137,8 +165,12 @@
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
 	{ id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
   ]
+  
 
   export default {
+	components: {
+	  Popup
+	},
     data() {
       return {
         // 枚举类
@@ -155,13 +187,18 @@
         userInfo: {},
 		gradeInfo: {},
         // 账户资产
-        assets: { prestore: '--', timer: '--', coupon: '--' },
+        assets: { prestore: '0', timer: '0', coupon: '0' },
         // 我的服务
         service,
         // 订单操作
         orderNavbar,
         // 当前用户待处理的订单数量
-        todoCounts: { payment: 0 }
+        todoCounts: { payment: 0 },
+		current: 0,
+		// 显示、隐藏弹窗
+		showPopup: false,
+		memberGrade: [],
+		curGrade: {}
       }
     },
 
@@ -236,10 +273,11 @@
       getUserInfo() {
         const app = this
         return new Promise((resolve, reject) => {
-          !app.isLogin ? resolve(null) : UserApi.info()
+            UserApi.info()
             .then(result => {
               app.userInfo = result.data.userInfo
 			  app.gradeInfo = result.data.gradeInfo
+			  app.memberGrade = result.data.memberGrade
               resolve(app.userInfo)
 			  resolve(app.gradeInfo)
             })
@@ -285,6 +323,13 @@
             })
         })
       },
+	  
+	  // 会员等级
+	  onShowPopup(index) {
+		this.showPopup = !this.showPopup
+		this.current = index
+		this.curGrade = this.memberGrade[index]
+	  },
 
       // 跳转到登录页
       handleLogin() {
@@ -418,7 +463,7 @@
 	  .pay-qr {
 		  color:#ffffff;
 		  margin-top: 25rpx;
-		  margin-left: 200rpx;
+		  margin-left: 160rpx;
 		  text-align: center;
 		  .qrcode {
 			  display: block;
@@ -447,47 +492,27 @@
   .my-asset {
     display: flex;
     background: #fff;
+	margin: 0 20rpx 0 20rpx;
     padding: 40rpx 0;
 
     .asset-right {
       width: 200rpx;
       border-left: 1rpx solid #eee;
     }
-
-    .asset-right-item {
-      text-align: center;
-      color: #545454;
-
-      .item-icon {
-        font-size: 60rpx;
-      }
-
-      .item-name {
-        margin-top: 10rpx;
-      }
-
-      .item-name text {
-        font-size: 25rpx;
-      }
-
-    }
-
     .asset-left-item {
       text-align: center;
       color: #666;
       padding: 0 72rpx;
+	  width: 33%;
 
       .item-value {
-        font-size: 40rpx;
+        font-size: 35rpx;
         color: red;
       }
-
+	  
       .item-name {
-        margin-top: 6rpx;
-      }
-
-      .item-name {
-        font-size: 28rpx;
+        font-size: 25rpx;
+		margin-top: 6rpx;
       }
     }
 
@@ -506,7 +531,7 @@
 
     &-item {
       position: relative;
-      width: 25%;
+      width: 33%;
 
       .item-icon {
         text-align: center;
@@ -581,7 +606,91 @@
 
       }
     }
-
-
   }
+  
+  // 会员升级
+  .member-update {
+	  margin: 22rpx auto 22rpx auto;
+	  padding: 20rpx 0;
+	  border-radius: 5rpx;
+	  box-shadow: 0 1rpx 5rpx 0px rgba(0, 0, 0, 0.05);
+	  background: #fff;
+	  width: 94%;
+	  text-align: center;
+	  .update-title {
+		padding-left: 20rpx;
+		margin-bottom: 30rpx;
+		font-size: 28rpx;
+		text-align: left;
+	  }
+	  .recharge {
+			position: relative;
+			margin-bottom: 35rpx;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			
+			&-tag {
+				position: absolute;
+				top: -2rpx;
+				left: -2rpx;
+				width: 170rpx;
+				height: 36rpx;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: center;
+				background-image: url('~@/static/user/tag.png');
+				background-size: 100%;
+				
+				&-text {
+					font-size: 20rpx;
+					color: #FFFFFF;
+					text-align: center;
+				}
+			}
+			
+			&-item {
+				position: relative;
+				padding: 40rpx 0;
+				margin-left: 15rpx;
+				width: 29.33%;
+				height: 270rpx;
+				flex-shrink: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				border: solid 1rpx #CBCCCE;
+				border-radius: 12rpx;
+				
+				&-active {
+					border: solid 2rpx #EDD2A9;
+					background-color: #FBF1E5;
+				}
+				
+				&-duration {
+					margin-bottom: 30rpx;
+					font-size: 26rpx;
+					color: #1C1C1C;
+				}
+				
+				&-price {
+					margin-bottom: 20rpx;
+					display: flex;
+					flex-direction: row;
+					align-items: baseline;
+					
+					&-text {
+						font-size: 48rpx;
+						color: #E3BE83;
+					}
+				}
+				
+				&-des {
+					font-size: 22rpx;
+					color: #A5A3A2;
+				}
+			}
+		}
+	}
 </style>
