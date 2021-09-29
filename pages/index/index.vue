@@ -64,7 +64,7 @@
 					}, {
 						"imgUrl": "/static/nav/3.png",
 						"imgName": "icon-1.png",
-						"linkUrl": "pages\/coupon\/list?type=C",
+						"linkUrl": "pages\/coupon\/list?type=C&needPoint=1",
 						"text": "积分兑换",
 						"tip": "积分换好礼",
 						"color": "#666666"

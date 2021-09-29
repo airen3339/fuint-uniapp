@@ -5,6 +5,10 @@
       <image class="bg-image" src="/static/background/user-header.png" mode="scaleToFill"></image>
       <!-- 用户信息 -->
       <view v-if="isLogin" class="user-info">
+		<!--头像-->
+		<view class="user-avatar">
+		  <image class="image" :src="userInfo.avatar ? userInfo.avatar : '/static/default-avatar.png'"></image>
+		</view>
         <view class="user-content">
 	      <!-- 会员昵称 -->
           <view class="nick-name">{{ userInfo.name }}</view>
@@ -19,6 +23,7 @@
           </view>
           <!-- 会员无等级时显示手机号 -->
           <view v-else class="mobile">{{ userInfo.mobile }}</view>
+		  <view class="active-time" v-if="gradeEndTime">{{ gradeEndTime }}</view>
         </view>
 		<view class="amount-info">
 			<view class="amount-tip">余额（元）</view>
@@ -29,11 +34,15 @@
 			<view class="topay">付款</view>
 		</view>
       </view>
-	  <view v-if="isLogin" class="user-point">
+	  <view v-if="isLogin" class="user-point" @click="onTargetPoints">
 	    <text>积分 | {{ userInfo.point }}</text>
 	  </view>
       <!-- 未登录 -->
       <view v-if="!isLogin" class="user-info" @click="handleLogin">
+		<!--头像-->
+		<view class="user-avatar">
+		    <image class="image" src="/static/default-avatar.png"></image>
+		</view>
         <view class="user-content">
           <view class="nick-name">未登录</view>
           <view class="login-tips">点击登录账号</view>
@@ -42,7 +51,7 @@
     </view>
 	
 	<!--会员升级 start-->
-	<view class="member-update">
+	<view class="member-update" v-if="memberGrade.length > 0">
 		<view class="update-title">
 			<text>会员升级</text>
 		</view>
@@ -165,7 +174,6 @@
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
 	{ id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
   ]
-  
 
   export default {
 	components: {
@@ -186,6 +194,7 @@
         // 当前用户信息
         userInfo: {},
 		gradeInfo: {},
+		gradeEndTime: '',
         // 账户资产
         assets: { prestore: '0', timer: '0', coupon: '0' },
         // 我的服务
@@ -206,18 +215,17 @@
      * 生命周期函数--监听页面显示
      */
     onShow(options) {
-      // 判断是否已登录
-      this.isLogin = checkLogin()
+	  // 获取页面数据
+	  this.getPageData()
+      
+	  // 判断是否已登录
+	  this.isLogin = checkLogin()
 	  
 	  // 消息显示
 	  showMessage();
-	  
-      // 获取页面数据
-      this.getPageData()
     },
 
     methods: {
-
       // 获取页面数据
       getPageData(callback) {
         const app = this
@@ -256,7 +264,7 @@
         const newOrderNavbar = []
         orderNavbar.forEach(item => {
           if (item.hasOwnProperty('count')) {
-            item.count = app.todoCounts[item.id]
+            item.count = app.isLogin ? app.todoCounts[item.id] : 0
           }
           newOrderNavbar.push(item)
         })
@@ -276,8 +284,15 @@
             UserApi.info()
             .then(result => {
               app.userInfo = result.data.userInfo
+			  
+			  if (app.userInfo == null && app.isLogin) {
+				  app.isLogin = false
+			  }
+			  
 			  app.gradeInfo = result.data.gradeInfo
 			  app.memberGrade = result.data.memberGrade
+			  app.gradeEndTime = result.data.gradeEndTime
+			  
               resolve(app.userInfo)
 			  resolve(app.gradeInfo)
             })
@@ -296,7 +311,7 @@
       getUserAssets() {
         const app = this
         return new Promise((resolve, reject) => {
-          !app.isLogin ? resolve(null) : UserApi.assets()
+            UserApi.assets()
             .then(result => {
               app.assets = result.data.asset
               resolve(app.assets)
@@ -348,7 +363,7 @@
 
       // 跳转到我的积分页面
       onTargetPoints() {
-        this.$navTo('pages/points/log')
+        this.$navTo('pages/points/detail')
       },
 
       // 跳转到我的优惠券页
@@ -399,16 +414,24 @@
 
     .user-info {
       display: flex;
-      height: 100rpx;
+      height: 200rpx;
       z-index: 1;
+	  .user-avatar {
+		  padding-top: 10rpx;
+		  .image {
+			  display: block;
+			  width: 100rpx;
+			  height: 100rpx;
+			  border-radius: 50%;
+	      }
+	  }
 	  
       .user-content {
         display: block;
         flex-direction: column;
         justify-content: center;
-        margin-left: 30rpx;
+        margin-left: 20rpx;
         color: #ffffff;
-		
         .nick-name {
           font-size: 32rpx;
           font-weight: bold;
@@ -438,8 +461,10 @@
             font-size: 24rpx;
             color: #EEE0C3;
           }
-
         }
+		.active-time {
+			margin-top: 3rpx;
+		}
 
         .login-tips {
           margin-top: 12rpx;
@@ -463,7 +488,7 @@
 	  .pay-qr {
 		  color:#ffffff;
 		  margin-top: 25rpx;
-		  margin-left: 160rpx;
+		  margin-left: 50rpx;
 		  text-align: center;
 		  .qrcode {
 			  display: block;

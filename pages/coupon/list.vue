@@ -59,7 +59,7 @@
 				  </view>
 				  <view class="attr-r">
 					  <!--领券按钮-->
-					  <view class="receive" v-if="item.type === 'C' && item.isReceive === false" @click="receive(item.id)">
+					  <view class="receive" v-if="item.type === 'C' && item.isReceive === false">
 					  	<text>立即领取</text>
 					  </view>
 					  <view class="receive state" v-if="item.type === 'C' && item.isReceive === true">
@@ -68,7 +68,7 @@
 					  <view class="receive" v-if="item.type === 'P' && item.isReceive === false">
 						<text>立即预存</text>
 					  </view>
-					  <view v-if="item.type === 'T' && item.isReceive === false" class="receive" @click="receive(item.id)">
+					  <view v-if="item.type === 'T' && item.isReceive === false" class="receive">
 					  	<text>参与集次</text>
 					  </view>
 					  <view v-if="item.type === 'T' && item.isReceive === true" class="receive state">
@@ -148,7 +148,6 @@
     },
 
     methods: {
-
       /**
        * 上拉加载的回调 (页面初始化时也会执行一次)
        * 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10
@@ -187,6 +186,7 @@
           sortType: app.sortType,
           sortPrice: Number(app.sortPrice),
           type: app.options.type || "C",
+		  needPoint: app.options.needPoint || '0',
           name: app.options.search || '',
           pageNumber: pageNo
         }
@@ -232,21 +232,6 @@
             }
         }
       },
-	  
-	  // 领取卡券
-	  receive(couponId) {
-	  	const app = this
-	  	couponApi.receive(couponId)
-	  	  .then(result => {
-			// 显示提示
-			if (parseInt(result.code) === 200) {
-				// 刷新列表
-				app.getCouponList()
-			} else {
-				app.$error(result.message)
-			}
-	  	  })
-	  },
 
       //卡券搜索
       handleSearch() {

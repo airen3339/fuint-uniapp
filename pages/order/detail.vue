@@ -39,9 +39,13 @@
         <text class="phone">{{order.userInfo.mobile}}</text>
       </view>
     </view>
+	
+	<view class="order-type">
+	    <text class="type">{{ order.typeName }}</text>
+	</view>
 
     <!-- 商品列表 -->
-    <view class="goods-list i-card">
+    <view class="goods-list i-card" v-if="order.goods.length > 0">
       <view class="goods-item" v-for="(goods, idx) in order.goods" :key="idx">
         <view class="goods-main" @click="handleTargetGoods(goods.id, goods.type)">
           <!-- 商品图片 -->
@@ -56,7 +60,7 @@
           <view class="goods-trade">
             <view class="goods-price">
               <text class="unit">￥</text>
-              <text class="value">{{goods.price}}</text>
+              <text class="value">{{ goods.price }}</text>
             </view>
             <view class="goods-num">
               <text>×{{goods.num}}</text>
@@ -84,7 +88,7 @@
         </view>
       </view>
       <view class="info-item">
-        <view class="item-lable">买家留言</view>
+        <view class="item-lable">备注信息</view>
         <view class="item-content">
           <text>{{order.remark ? order.remark : '--'}}</text>
         </view>
@@ -423,6 +427,11 @@
       }
     }
 
+  }
+  
+  .order-type {
+    font-weight: bold;
+    margin: 23rpx;
   }
 
   // 物流公司

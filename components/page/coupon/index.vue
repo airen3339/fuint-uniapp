@@ -36,7 +36,7 @@
 					  </view>
 					  <view class="attr-r">
 						  <!--领券按钮-->
-						  <view class="receive" v-if="dataItem.type === 'C' && dataItem.isReceive === false" @click="receive(dataItem.id)">
+						  <view class="receive" v-if="dataItem.type === 'C' && dataItem.isReceive === false">
 						  	<text>立即领取</text>
 						  </view>
 						  <view class="receive state" v-if="dataItem.type === 'C' && dataItem.isReceive === true">
@@ -45,7 +45,7 @@
 						  <view class="receive" v-if="dataItem.type === 'P' && dataItem.isReceive === false">
 						  	<text>立即预存</text>
 						  </view>
-						  <view v-if="dataItem.type === 'T' && dataItem.isReceive === false" class="receive" @click="receive(dataItem.id)">
+						  <view v-if="dataItem.type === 'T' && dataItem.isReceive === false" class="receive">
 						  	<text>参与集次</text>
 						  </view>
 						  <view v-if="dataItem.type === 'T' && dataItem.isReceive === true" class="receive state">
@@ -94,27 +94,11 @@
 		  } else {
               if (type === 'C') {
               	  this.$navTo(`pages/coupon/detail`, { couponId: couponId, userCouponId: userCouponId })
-              } else if(type === 'T'){
+              } else if(type === 'T') {
                   this.$navTo(`pages/timer/detail`, { couponId: couponId, userCouponId: userCouponId })
               }
-		  }
-      },
-	  receive(couponId) {
-		const app = this
-		couponApi.receive(couponId)
-		  .then(result => {
-		    // 显示提示
-			if (parseInt(result.code) === 200) {
-				// 刷新列表
-				pageApi.home()
-				  .then(dataResult => {
-					app.dataList = dataResult.data.coupon.content
-				  })
-			} else {
-				app.$error(result.message)
-			}
-		  })
-	  }
+		 }
+      }
     }
   }
 </script>

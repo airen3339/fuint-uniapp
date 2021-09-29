@@ -6,11 +6,18 @@
       </view>
     </view>
     <view class="auth-title">申请获取以下权限</view>
-    <view class="auth-subtitle">获得你的公开信息（昵称、头像等）</view>
-    <view class="login-btn">
-      <button class="button btn-normal" @click.stop="getUserProfile">授权登录</button>
-	  <!--<button class="button btn-normal" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">授权登录</button>-->
-    </view>
+	<view v-if="needPhone == 'true'">
+		<view class="auth-subtitle">获得您微信绑定的手机号码</view>
+		<view class="login-btn">
+		  <button class="button btn-normal" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">授权登录</button>
+		</view>
+	</view>
+	<view v-if="needPhone != 'true'">
+		<view class="auth-subtitle">获得你的公开信息（昵称、头像等）</view>
+		<view class="login-btn">
+		  <button class="button btn-normal" @click.stop="getUserProfile">授权登录</button>
+		</view>
+	</view>
     <view class="no-login-btn">
       <button class="button btn-normal" @click="handleCancel">暂不登录</button>
     </view>
@@ -19,20 +26,24 @@
 
 <script>
   import store from '@/store'
-
+  import * as UserApi from '@/api/user'
   export default {
 
     data() {
       return {
         // 微信小程序登录凭证 (code)
         // 提交到后端，用于换取openid
-        code: ''
+        code: '',
+		needPhone: false
       }
     },
 
     created() {
       // 获取code
       this.getCode()
+	  
+	  // 获取配置
+	  this.getUserSetting()
     },
 
     methods: {
@@ -51,6 +62,19 @@
           })
         })
       },
+	  
+	  getUserSetting() {
+	    const app = this
+	    return new Promise((resolve, reject) => {
+	        UserApi.setting()
+	        .then(result => {
+	            app.needPhone = result.data.loginNeedPhone
+	        })
+	        .catch(err => {
+	          // empty
+	        })
+	    })
+	  },
 
       // 获取微信用户信息
       getUserProfile() {

@@ -57,7 +57,7 @@
 
   .item-nav {
     float: left;
-    margin: 5rpx 0px 5rpx 0px;
+    margin: 10rpx 0px 5rpx 0px;
     text-align: center;
 	background: #ffffff;
 	padding: 2rpx;
@@ -65,10 +65,10 @@
 	.nav-to {
 		border: 2rpx solid #00acac;
 		margin: 0rpx 2px 0px 2px;
-		padding: 20rpx 10rpx 10rpx 10rpx;
+		padding: 38rpx 10rpx 10rpx 10rpx;
 		border-radius: 8rpx;
 		background: #ffffff;
-		height: 120rpx;
+		height: 150rpx;
 	}
 
     .item-text {
@@ -78,8 +78,8 @@
 		  font-size: 30rpx;
 	  }
 	  .tip {
-		  font-size: 20rpx;
-		  margin-top: 6rpx;
+		  font-size: 22rpx;
+		  margin-top: 8rpx;
 		  color: #999;
 	  }
     }

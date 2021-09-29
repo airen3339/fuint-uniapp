@@ -4,8 +4,8 @@ import * as LoginApi from '@/api/login'
 
 // 登陆成功后执行
 const loginSuccess = (commit, { token, userId }) => {
-  // 过期时间30天
-  const expiryTime = 30 * 86400
+  // 过期时间3天
+  const expiryTime = 3 * 86400
   // 保存tokne和userId到缓存
   storage.set(USER_ID, userId, expiryTime)
   storage.set(ACCESS_TOKEN, token, expiryTime)
@@ -32,7 +32,6 @@ const user = {
   },
 
   actions: {
-
     // 用户登录
     Login({ commit }, data) {
       return new Promise((resolve, reject) => {

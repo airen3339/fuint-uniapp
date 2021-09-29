@@ -1,5 +1,5 @@
 <template>
-  <view class="grade-popup popup" catchtouchmove="true" :class="(value && complete) ? 'show' : 'none'"
+  <view class="pay-popup popup" catchtouchmove="true" :class="(value && complete) ? 'show' : 'none'"
     @touchmove.stop.prevent="moveHandle">
     <!-- 页面内容开始 -->
     <view class="mask" @click="close('mask')"></view>
@@ -8,26 +8,20 @@
       <view class="specification-wrapper">
         <scroll-view class="specification-wrapper-content" scroll-y="true">
           <view class="specification-header">
-            <view class="specification-name"><text class="price" v-if="memberGrade.catchValue > 0">￥{{ memberGrade.catchValue }}</text>购买{{ memberGrade.name }}</view>
+            <view class="specification-name">支付确认</view>
           </view>
           <view class="specification-content">
-			<view class="grade-item" v-if="memberGrade.discount > 0">
-			    <view class="item-rule"><view class="title">买单折扣：</view>{{ memberGrade.discount }}折</view>
-			</view>
-			<view class="grade-item" v-if="memberGrade.speedPoint > 0">
-			    <view class="item-rule"><view class="title">积分加速：</view>{{ memberGrade.speedPoint }}倍</view>
-			</view>
-            <view class="grade-item">
-                <view class="item-rule">
-					<view class="title">有效期限：</view>
-					<text v-if="memberGrade.validDay > 0">{{ memberGrade.validDay }}天</text>
-					<text v-else>永久</text>
+            <view class="pay-item">
+                <view class="item-point">
+					<view class="title">使用<text class="point-amount">{{ payInfo.usePoint }}</text>积分抵扣
+					   <text class="amount">￥{{ payInfo.pointAmount }}</text>
+					   <text class="modify" @click="modifyPoint">修改>></text>
+					</view>
 				</view>
             </view>
-			<view class="grade-description">
-			    <view class="item-rule">
-					<view class="title">权益说明：</view>
-				    <view>1、5折;2、10倍积分</view>
+			<view class="pay-item">
+			    <view class="item-amount">
+					<view class="title">实付金额：￥<text class="amount">{{ payInfo.payAmount }}</text></view>
 				</view>
 			</view>
           </view>
@@ -37,10 +31,15 @@
         </view>
       </view>
       <view class="btn-wrapper">
-        <view class="sure" @click="buyNow">立即购买</view>
+        <view class="sure" @click="payNow">确认支付</view>
       </view>
       <!-- 页面结束 -->
     </view>
+	<view class="point-popup">
+	   <uni-popup ref="pointPopup" type="dialog">
+		  <uni-popup-dialog mode="input" focus="false" v-model="payInfo.usePoint" title="修改积分"  type="info" placeholder="请输入积分数量" :before-close="true" @close="cancelUsePoint" @confirm="doUsePoint"></uni-popup-dialog>
+	   </uni-popup>
+	</view>
     <!-- 页面内容结束 -->
   </view>
 </template>
@@ -53,7 +52,7 @@
   var that; // 当前页面对象
   var vk; // 自定义函数集
   export default {
-    name: 'GradePopup',
+    name: 'PayPopup',
     props: {
       // true 组件显示 false 组件隐藏
       value: {
@@ -61,8 +60,8 @@
         default: false
       },
       // vk云函数路由模式参数开始-----------------------------------------------------------
-      // 等级信息
-      memberGrade: {
+      // 支付信息
+      payInfo: {
         Type: Object,
         default: {}
       },
@@ -87,6 +86,7 @@
       return {
         complete: false, // 组件是否加载完成
         isShow: false, // true 显示 false 隐藏
+		usePoint: ''
       };
     },
     mounted() {
@@ -119,11 +119,11 @@
         //禁止父元素滑动
       },
 	  
-      // 立即购买
-      buyNow() {
+      // 立即支付
+      payNow() {
 		const app = this
 		// 请求api
-		SettlementApi.submit(app.memberGrade.id, "", "member", "", "", 0)
+		SettlementApi.submit(0, "", "payment", app.payInfo.remark, app.payInfo.payAmount, app.payInfo.usePoint)
 		  .then(result => app.onSubmitCallback(result))
 		  .catch(err => {
 		    if (err.result) {
@@ -132,7 +132,7 @@
 		        return false
 		      }
 		    }
-		  })
+		})
       },
 	  // 订单提交成功后回调
 	  onSubmitCallback(result) {
@@ -163,6 +163,26 @@
 	      app.$error('支付成功')
 	    }
 	  },
+	  modifyPoint() {
+		this.$refs.pointPopup.open('top')
+	  },
+	  doUsePoint(usePoint) {
+		if (!(/(^[1-9]\d*$)/.test(usePoint))) {
+			this.$error('请输入正整数')
+		　　return false
+		}
+		
+		if (usePoint > this.payInfo.maxPoint) {
+			this.$error('最多使用' + this.payInfo.maxPoint + '积分')
+			return false
+		}
+		
+		this.$emit('modifyUsePoint', usePoint)
+	  	this.$refs.pointPopup.close()
+	  },
+	  cancelUsePoint() {
+	  	this.$refs.pointPopup.close()
+	  },
       // 弹窗
       toast(title, icon) {
         uni.showToast({
@@ -182,7 +202,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .grade-popup {
+  .pay-popup {
     position: fixed;
     left: 0;
     top: 0;
@@ -260,9 +280,6 @@
             margin-bottom: 40rpx;
 			text-align: center;
 			.specification-name {
-				.price {
-					color: red;
-				}
 				font-weight: bold;
 				width: 100%;
 				font-size: 30rpx;
@@ -271,31 +288,29 @@
           }
 
           .specification-content {
-            font-weight: 500;
-			font-size: 26rpx;
-			.grade-item {
-				.title {
-				   font-weight: bold;
-				   display: flex;
-				   float: left;
+			text-align: center;
+			.pay-item {
+				padding: 30rpx;
+				cursor: pointer;
+				margin-bottom: 10rpx;
+				border: solid 1rpx #cccccc;
+				border-radius: 5rpx;
+				.item-point {
+					.amount {
+						font-weight: bold;
+					}
+					.modify {
+						margin-left: 30rpx;
+						color: #0090FF;
+					}
 				}
-				display: flex;
-				height: 100rpx;
-				padding-top:30rpx;
-				cursor:pointer;
-				.item-rule {
-					padding: 20rpx;
-					border-bottom: solid 1px #cccccc;
-					width: 100%;
-					text-align: left;
-				}
-			}
-			.grade-description {
-				margin-top: 20rpx;
-				padding: 20rpx;
-				min-height: 100rpx;
-				.title {
-                   font-weight: bold;
+				.item-amount {
+					font-size: 30rpx;
+					.amount {
+						color: #f9211c;
+						font-size: 35rpx;
+						font-weight: bold;
+					}
 				}
 			}
           }

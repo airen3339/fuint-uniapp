@@ -4,22 +4,21 @@
       :up="upOption" @up="upCallback">
 
       <!-- tab栏 -->
-      <u-tabs :list="tabs" :is-scroll="false" :current="curTab" active-color="#FA2209" :duration="0.2"
-        @change="onChangeTab" />
+      <u-tabs :list="tabs" :is-scroll="false" :current="curTab" active-color="#FA2209" :duration="0.2" @change="onChangeTab" />
 
       <!-- 订单列表 -->
       <view class="order-list">
         <view class="order-item" v-for="(item, index) in list.content" :key="index">
-          <view class="item-top">
+          <view class="item-top" @click="handleTargetDetail(item.id)">
             <view class="item-top-left">
-              <text class="order-time">{{ item.createTime }}</text>
+			  <text class="order-type">{{ item.typeName }}</text>
             </view>
             <view class="item-top-right">
               <text :class="item.status">{{ item.statusText }}</text>
             </view>
           </view>
           <!-- 商品列表 -->
-          <view class="goods-list" @click="handleTargetDetail(item.id)">
+          <view class="goods-list" v-if="item.goods" @click="handleTargetDetail(item.id)">
             <view class="goods-item" v-for="(goods, idx) in item.goods" :key="idx">
               <!-- 商品图片 -->
               <view class="goods-image">
@@ -41,16 +40,24 @@
               </view>
             </view>
           </view>
+		  <!-- 备注信息 -->
+		  <view v-if="item.remark" class="remark" @click="handleTargetDetail(item.id)">
+			  <text>备注：</text>
+			  <text>{{ item.remark ? item.remark : '--'}}</text>
+		  </view>
           <!-- 订单合计 -->
-          <view class="order-total">
+          <view class="order-total" @click="handleTargetDetail(item.id)">
             <text>总金额</text>
             <text class="unit">￥</text>
             <text class="money">{{ item.amount }}</text>
           </view>
           <!-- 订单操作 -->
-          <view v-if="item.status == 'A'" class="order-handle">
-            <view class="btn-group clearfix">
-              <!-- 未支付取消订单 -->
+          <view class="order-handle">
+			<view class="order-time">
+				<text class="time">{{ item.createTime }}</text>
+			</view>
+            <view class="btn-group">
+              <!-- 取消订单 -->
               <view v-if="item.status == 'A'">
                 <view class="btn-item" @click="onCancel(item.id)">取消</view>
               </view>
@@ -384,8 +391,9 @@
     font-size: 26rpx;
     margin-bottom: 40rpx;
 
-    .order-time {
-      color: #777;
+    .order-type {
+	  font-weight: bold;
+	  margin-left: 20rpx;
     }
 
     .state-text {
@@ -395,7 +403,6 @@
 
   // 商品列表
   .goods-list {
-
     // 商品项
     .goods-item {
       display: flex;
@@ -456,16 +463,19 @@
         .goods-price {
           vertical-align: bottom;
           margin-bottom: 16rpx;
-
           .unit {
             margin-right: -2rpx;
             font-size: 24rpx;
           }
         }
       }
-
     }
-
+  }
+  // 备注信息
+  .remark {
+	  padding: 12rpx 0 12rpx 20rpx;
+	  border-radius: 5rpx;
+	  height: 60rpx;
   }
 
   // 订单合计
@@ -474,6 +484,7 @@
     vertical-align: bottom;
     text-align: right;
     height: 40rpx;
+	margin-top: 30rpx;
     margin-bottom: 30rpx;
 
     .unit {
@@ -489,6 +500,12 @@
 
   // 订单操作
   .order-handle {
+	height: 50rpx;
+	.order-time {
+	    color: #777;
+		float: left;
+		margin-left: 20rpx;
+	}
     .btn-group {
 
       .btn-item {

@@ -3,7 +3,8 @@ import request from '@/utils/request'
 // api地址
 const api = {
   userInfo: 'user/info',
-  assets: 'user/asset'
+  assets: 'user/asset',
+  setting: 'user/setting'
 }
 
 // 当前登录的用户信息
@@ -19,4 +20,9 @@ export const info = (param, option) => {
 // 账户资产
 export const assets = (param, option) => {
   return request.get(api.assets, param)
+}
+
+// 会员设置
+export const setting = (param, option) => {
+  return request.get(api.setting, param)
 }

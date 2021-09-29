@@ -2,16 +2,17 @@
   <view class="container b-f p-b">
 	<view class="base">
 		<view class="merchant-name">
-		  <view class="name">小隅安电子商务</view>
+		  <view class="name">Fuint演示系统</view>
 		</view>
 	</view>
     <view class="pay-form">
     	<u-form :model="form" label-width="100rpx">
     	  <u-form-item class="input" prop="payAmount" :border-bottom="false" label="金额" rules="[{ required: true, message: '请输入支付金额', trigger: 'blur' }]">
-    	      <view class="amount-icon">￥</view><u-input class="amount" disabled="true" v-model="form.payAmount" type="digit" placeholder=" "/>
+    	      <view class="amount-icon">￥</view>
+			  <view class="amount">{{ form.payAmount }}</view>
     	  </u-form-item>
 		  <u-form-item class="input" v-if="form.remark" :border-bottom="false" label="备注">
-		      <u-input v-model="form.remark" type="text" placeholder=""/>
+		      <u-input v-model="form.remark" type="text" placeholder="请输入备注信息"/>
 		  </u-form-item>
 		  <u-form-item :border-bottom="false">
 		      <view class="remark" @click="showRemarkPop()"><text class="iconfont icon-edit"></text>添加备注</view>
@@ -26,33 +27,40 @@
 		  <uni-popup-dialog mode="input" focus="false" v-model="form.remark" title="备注信息" type="info" placeholder="请输入备注信息" :before-close="true" @close="cancelRemark" @confirm="doRemark"></uni-popup-dialog>
 	   </uni-popup>
 	</view>
+	
+	<Popup v-if="!isLoading" v-model="showPopup" :payInfo="payInfo" @modifyUsePoint="modifyUsePoint"/>
   </view>
 </template>
 
 <script>
   import jyfParser from '@/components/jyf-parser/jyf-parser'
-  import Shortcut from '@/components/shortcut'
   import * as SettlementApi from '@/api/settlement'
   import PayTypeEnum from '@/common/enum/order/PayType'
   import { wxPayment } from '@/utils/app'
+  import Popup from './components/Popup'
 
   export default {
     components: {
-      Shortcut
+	  Popup
     },
     data() {
       return {
         // 加载中
-        isLoading: true,
-        form: {'payAmount': '', 'remark' : ''}
+        isLoading: false,
+		showPopup: false,
+        form: {'payAmount': '', 'remark' : ''},
+		payInfo: {'usePoint': 0, 'pointAmount': 0, 'payAmount': 0, 'maxPoint': 0},
+		canUsedAsMoney: false,
+		exchangeNeedPoint: 0,
+		canUsePointAmount: 0,
       }
     },
 
     /**
-     * 生命周期函数--监听页面加载
+     * 生命周期函数--监听页面显示
      */
-    onLoad(options) {
-	  //empty
+    onShow(options) {
+	  this.prePay()
     },
 
     methods: {
@@ -70,6 +78,53 @@
       changeAmount(e) {
 		this.form.payAmount = e
       },
+	  // 支付前查询
+	  prePay() {
+		const app = this
+		// 请求api
+		SettlementApi.prePay()
+		  .then(result => {
+			  if (result.data) {
+				  app.canUsedAsMoney = result.data.canUsedAsMoney
+				  app.exchangeNeedPoint = result.data.exchangeNeedPoint
+				  app.canUsePointAmount = result.data.canUsePointAmount
+				  app.payInfo.maxPoint = result.data.canUsePointAmount
+			  }
+		  })
+		  .catch(err => {
+		    if (err.result) {
+		      const errData = err.result.data
+		      if (errData) {
+		        return false
+		      }
+		    }
+		})  
+	  },
+	  // 改变支付信息
+	  modifyUsePoint(usePoint) {
+		const app = this
+		
+		if (app.canUsedAsMoney == 'true') {
+			app.payInfo.usePoint = parseInt(usePoint);
+		}
+		
+		if (app.canUsedAsMoney == 'true') {
+			app.payInfo.pointAmount = parseInt(usePoint) / parseInt(app.exchangeNeedPoint);
+		}
+		
+		// 积分金额不能大于支付金额
+		if (parseFloat(app.payInfo.pointAmount) > parseFloat(app.form.payAmount)) {
+			app.payInfo.pointAmount = parseFloat(app.form.payAmount)
+			app.payInfo.usePoint = parseInt(app.exchangeNeedPoint) * parseFloat(app.form.payAmount)
+		}
+		
+		app.payInfo.payAmount = parseFloat(app.form.payAmount) - parseFloat(app.payInfo.pointAmount)
+		
+		// 支付金额不能小于0
+		if (app.payInfo.payAmount < 0) {
+			app.payInfo.payAmount = 0
+		}
+	  },
 	  // 提交支付
 	  doPay() {
 	    const app = this
@@ -79,17 +134,37 @@
 			return false
 		}
 		
-	    // 请求api
-	    SettlementApi.submit(0, "", "payment", app.form.remark, app.form.payAmount)
-	      .then(result => app.onSubmitCallback(result))
-	      .catch(err => {
-	        if (err.result) {
-	          const errData = err.result.data
-	          if (errData) {
-	            return false
-	          }
-	        }
-	      })
+		if (parseFloat(app.form.payAmount) < 0.01) {
+			app.$error('支付金额小于0.01元')
+			return false
+		}
+		
+		if (app.canUsedAsMoney == 'true' && parseInt(app.canUsePointAmount) > 0) {
+			app.payInfo.usePoint = parseInt(app.canUsePointAmount)
+		}
+		
+		if (app.canUsedAsMoney == 'true' && parseInt(app.canUsePointAmount) > 0) {
+			app.payInfo.pointAmount = parseInt(app.canUsePointAmount) / parseInt(app.exchangeNeedPoint)
+		}
+		
+		// 积分金额不能大于支付金额
+		if (parseFloat(app.payInfo.pointAmount) > parseFloat(app.form.payAmount)) {
+			app.payInfo.pointAmount = parseFloat(app.form.payAmount)
+			app.payInfo.usePoint = parseInt(app.exchangeNeedPoint) * parseFloat(app.form.payAmount)
+		}
+		
+		app.payInfo.payAmount = parseFloat(app.form.payAmount) - parseFloat(app.payInfo.pointAmount)
+		if (app.payInfo.payAmount < 0) {
+			app.payInfo.payAmount = 0
+		}
+		
+		app.payInfo = { "remark": app.form.remark, "pointAmount": app.payInfo.pointAmount.toFixed(2), 
+		                "usePoint": app.payInfo.usePoint, "payAmount": app.payInfo.payAmount.toFixed(2),
+						"maxPoint": app.payInfo.maxPoint }
+		
+		app.showPopup = !app.showPopup
+		
+		return true;
 	  },
 	  
 	  // 订单提交成功后回调
@@ -121,7 +196,7 @@
 	    if (result.data.payType == PayTypeEnum.BALANCE.value) {
 	      app.$error('支付成功')
 	    }
-	  },
+	  }
     }
   }
 </script>
@@ -162,16 +237,17 @@
 		padding-right: 20rpx;
 		margin-top: 30rpx;
   		margin-bottom: 20rpx;
-  		border-radius: 10rpx;
   		width: 94%;
-		border: dashed 1rpx #cccccc;
+		border-bottom: dashed 3rpx #cccccc;
   		display: inline-flex;
   	}
 	.amount {
 		font-weight: bold;
+		font-size: 72rpx;
+		float: left;
 	}
 	.amount-icon {
-		font-size: 45rpx;
+		font-size: 38rpx;
 		font-weight: bold;
 		float: left;
 	}

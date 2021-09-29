@@ -131,16 +131,38 @@
 	  },
 	  receive(couponId) {
 		const app = this
-		couponApi.receive(couponId)
-		  .then(result => {
-			// 显示提示
-			if (parseInt(result.code) === 200) {
-				app.detail.isReceive = true
-				app.$success("领取成功！")
-			} else {
-				app.$error(result.message)
-			}
-		  })
+		
+		if (app.detail.point) {
+			uni.showModal({
+			  title: "提示信息",
+			  content: "领取需要"+app.detail.point+"积分兑换，确定领取吗?",
+			  success({ confirm }) {
+				if (confirm) {
+					couponApi.receive(couponId)
+					  .then(result => {
+						// 显示提示
+						if (parseInt(result.code) === 200) {
+							app.detail.isReceive = true
+							app.$success("领取成功！")
+						} else {
+							app.$error(result.message)
+						}
+					  })
+				}
+			  }
+			});
+		} else {
+			couponApi.receive(couponId)
+			  .then(result => {
+				// 显示提示
+				if (parseInt(result.code) === 200) {
+					app.detail.isReceive = true
+					app.$success("领取成功！")
+				} else {
+					app.$error(result.message)
+				}
+			})
+		}
 	  }
     }
   }
@@ -243,10 +265,6 @@
   	  color: #cccccc;
   	  background: #F5F5F5;
     }
-  }
-  .give-popup {
-	  border: #cccccc solid 1px;
-	  background: red;
   }
   
   /* 底部操作栏 */
