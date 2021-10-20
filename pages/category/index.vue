@@ -8,19 +8,7 @@
       <view class="cate-wrapper cate_style__10">
         <scroll-view :scroll-y="true" :style="{ height: `${scrollHeight - 10}px` }">
           <view class="cate-item" v-for="(item, index) in list" :key="index" @click="onTargetGoodsList(item.category_id)">
-            <image mode="widthFix" :src="item.image.preview_url"></image>
-          </view>
-        </scroll-view>
-      </view>
-    </view>
-
-    <!-- 分类样式：一级分类(小图) 11 -->
-    <view class="cate-content" v-else-if="templet.style == 11 && list.length > 0">
-      <view class="cate-wrapper cate_style__11">
-        <scroll-view class="clear" :scroll-y="true" :style="{ height: `${scrollHeight - 10}px` }">
-          <view class="cate-item" v-for="(item, index) in list" :key="index" @click="onTargetGoodsList(item.category_id)">
-            <image v-if="item.image" mode="widthFix" :src="item.image.preview_url"></image>
-            <text class="f-26">{{ item.name }}</text>
+            <image mode="widthFix" :src="item.logo"></image>
           </view>
         </scroll-view>
       </view>
@@ -28,11 +16,13 @@
 
     <!-- 分类样式：二级分类 20 -->
     <view class="cate-content dis-flex" v-else-if="templet.style == 20 && list.length > 0">
-
+	
       <!-- 左侧 一级分类 -->
       <scroll-view class="cate-left f-28" :scroll-y="true" :style="{ height: `${scrollHeight}px` }">
-        <text class="type-nav" :class="{ selected: curIndex == index }" v-for="(item, index) in list" :key="index"
-          @click="handleSelectNav(index)">{{ item.name }}</text>
+		  <view v-for="(item, index) in list" :key="index">
+			  <text class="cart-badge" v-if="item.total">{{ item.total }}</text>
+			  <text class="type-nav" :class="{ selected: curIndex == index }" @click="handleSelectNav(index)">{{ item.name }}</text>
+		  </view>
       </scroll-view>
 
       <!-- 右侧 二级分类 -->
@@ -41,11 +31,22 @@
           <view class="cate-right-cont">
             <view class="cate-two-box">
               <view class="cate-cont-box">
-                <view class="flex-three" v-for="(item, idx) in list[curIndex].children" :key="idx" @click="onTargetGoodsList(item.category_id)">
+                <view class="flex-five item" v-for="(item, idx) in list[curIndex].goodsList" :key="idx">
                   <view class="cate-img">
-                    <image v-if="item.image" :src="item.image.preview_url"></image>
+                    <image v-if="item.logo" :src="item.logo"></image>
                   </view>
-                  <text>{{ item.name }}</text>
+				  <view class="cate-info">
+                    <text class="name text">{{ item.name }}</text>
+				    <text class="stock text">库存:{{ item.stock }} 已售:{{ item.initSale }}</text>
+				    <view class="action">
+						<text class="price">￥{{ item.price }}</text>
+						<view class="cart">
+						    <view class="ii do-minus" v-if="item.buyNum" @click="onSaveCart(item.id, '-')"></view>
+							<view class="ii num" v-if="item.buyNum">{{ (item.buyNum != undefined) ? item.buyNum : 0 }}</view>
+							<view class="ii do-add" v-if="item.stock > 0" @click="onSaveCart(item.id, '+')"></view>
+						</view>
+					</view>
+				  </view>
                 </view>
               </view>
             </view>
@@ -53,15 +54,28 @@
         </view>
       </scroll-view>
     </view>
+	
+	<view class="flow-fixed-footer b-f m-top10">
+	  <view class="dis-flex chackout-box">
+	    <view class="chackout-left pl-12">
+	      <view class="col-amount-do">总金额：￥{{ totalPrice }}</view>
+		  <view class="col-amount-view">共计：{{ totalNum }} 件</view>
+	    </view>
+	    <view class="chackout-right" @click="doSubmit()">
+	      <view class="flow-btn f-32">选好了</view>
+	    </view>
+	  </view>
+	</view>
+	
     <empty v-if="!list.length" :isLoading="isLoading" />
   </view>
 </template>
 
 <script>
   import { setCartTabBadge } from '@/utils/app'
-  import SettingKeyEnum from '@/common/enum/setting/Key'
-  import SettingModel from '@/common/model/Setting'
-  import * as CategoryApi from '@/api/category'
+  import * as SettlementApi from '@/api/settlement'
+  import * as CartApi from '@/api/cart'
+  import * as GoodsApi from '@/api/goods'
   import Search from '@/components/search'
   import Empty from '@/components/empty'
 
@@ -74,8 +88,11 @@
     },
     data() {
       return {
+		goodsCart: [],
+		totalNum: 0,
+		totalPrice: 0.00,
         // 列表高度
-        scrollHeight: 0,
+        scrollHeight: 500,
         // 一级分类：指针
         curIndex: 0,
         // 内容区竖向滚动条位置
@@ -83,7 +100,7 @@
         // 分类列表
         list: [],
         // 分类模板设置
-        templet: {},
+        templet: {'style': 20},
         // 正在加载中
         isLoading: true
       }
@@ -113,41 +130,40 @@
 
       /**
        * 获取页面数据
+	   * 
        */
       getPageData() {
         const app = this
         app.isLoading = true
         Promise.all([
-            // 获取分类模板设置
-            SettingModel.data(),
             // 获取分类列表
-            CategoryApi.list()
+            GoodsApi.cateList(),
+			// 获取购物车列表
+			CartApi.list()
           ])
           .then(result => {
-            // 初始化分类模板设置
-            app.initTemplet(result[0])
             // 初始化分类列表数据
-            app.initCategory(result[1])
+            app.list = result[0].data
+			app.totalNum = result[1].data.totalNum
+			app.goodsCart = result[1].data.list
           })
-          .finally(() => app.isLoading = false)
-      },
-
-      /**
-       * 初始化分类模板设置
-       * @param {Object} result
-       */
-      initTemplet(setting) {
-        this.templet = setting[SettingKeyEnum.PAGE_CATEGORY_TEMPLATE.value]
-      },
-
-      /**
-       * 初始化分类列表数据
-       * @param {Object} result
-       */
-      initCategory(result) {
-        const app = this
-        const data = result.data
-        app.list = data.list
+          .finally(() => {
+			  app.isLoading = false
+			  app.totalPrice = 0
+			  app.list.forEach(function(item, index) {
+				  let total = 0
+				  item.goodsList.forEach(function(goods, key) {
+					  app.goodsCart.forEach(function(cart){
+						 if (goods.id == cart.goodsId) {
+							app.$set(app.list[index].goodsList[key], 'buyNum', cart.num)
+							total = total + cart.num
+							app.totalPrice = app.totalPrice + (goods.price * cart.num)
+						 } 
+					  })
+				  })
+				  app.$set(app.list[index], 'total', total)
+			  })
+		  })
       },
 
       /**
@@ -168,12 +184,25 @@
         app.curIndex = index
         app.scrollTop = 0
       },
-
-      // 跳转至商品列表页
-      onTargetGoodsList(categoryId) {
-        this.$navTo('pages/goods/list', { categoryId })
-      }
-
+	  
+	  // 更新购物车
+	  onSaveCart(goodsId, action) {
+	    const app = this
+		console.log(goodsId + action)
+		CartApi.save(goodsId, action)
+		  .then(result => {
+			  app.getPageData()
+		  })
+	  },
+	  
+	  // 结算
+	  doSubmit() {
+		  if (this.totalPrice > 0) {
+		     this.$navTo('pages/settlement/goods', { couponId: 0, selectNum: '' })
+		  } else {
+			 this.$error("请先选择商品")
+		  }
+	  }
     },
 
     /**
@@ -219,7 +248,6 @@
   }
 
   /* 一级分类(大图) 10 */
-
   .cate_style__10 .cate-item {
     margin-bottom: 18rpx;
   }
@@ -235,7 +263,6 @@
   }
 
   /* 一级分类(小图) 11 */
-
   .cate_style__11 .cate-item {
     float: left;
     padding: 25rpx;
@@ -262,7 +289,6 @@
   }
 
   /* 二级分类 20 */
-
   .cate-content {
     width: 100%;
   }
@@ -274,6 +300,22 @@
     color: #444;
     height: 100%;
     background: #f8f8f8;
+	.cart-badge {
+	  position: absolute;
+	  right: 1rpx;
+	  margin-top: 10rpx;
+	  margin-right: 5rpx;
+	  font-size: 18rpx;
+	  background: red;
+	  z-index: 999999;
+	  text-align: center;
+	  line-height: 28rpx;
+	  color: #ffffff;
+	  border-radius: 100%;
+	  min-height: 30rpx;
+	  min-width: 30rpx;
+	  padding: 1rpx;
+	}
   }
 
   .cate-right {
@@ -303,17 +345,23 @@
   }
 
   .type-nav.selected {
-    background: #fff;
-    color: #fa2209;
+    color: #666666;
+	background: #ffffff;
     border-right: none;
+	border-left: solid 8rpx red;
+	font-weight: 555;
     font-size: 28rpx;
   }
 
   .cate-cont-box {
     margin-bottom: 30rpx;
     padding-bottom: 10rpx;
-    background: #fff;
+    background: #FFFFFF;
     overflow: hidden;
+	.item {
+		height: 200rpx;
+		clear: both;
+	}
   }
 
   .cate-cont-box .cate-img {
@@ -321,22 +369,113 @@
   }
 
   .cate-cont-box .cate-img image {
-    width: 100%;
+    width: 160rpx;
     height: 150rpx;
-    border-radius: 10rpx;
+	float: left;
+    border-radius: 5rpx;
   }
 
-  .cate-cont-box text {
-    text-align: center;
+  .cate-cont-box .cate-info {
+    text-align: left;
     display: block;
     font-size: 26rpx;
+	margin-left: 168rpx;
     padding-bottom: 14rpx;
     color: #444;
     padding: 0 15rpx 30rpx 15rpx;
+	.text {
+		display: block;
+		float: left;
+		width: 100%;
+	}
+	.name {
+		font-weight: bold;
+		width: 100%;
+		font-size: 26rpx;
+	}
+	.stock {
+		margin-top: 30rpx;
+		color: #999;
+	}
+	.action {
+		.price {
+			margin-top: 20rpx;
+			color: red;
+			float: left;
+		}
+		.cart {
+			margin-top: 20rpx;
+			float: right;
+			font-size: 30rpx;
+			height: 60rpx;
+			.ii {
+				float: left;
+				text-align: center;
+				width: 60rpx;
+				cursor: pointer;
+			}
+			.do-add {
+				background: url('~@/static/icon/add.png') no-repeat;
+				background-size: 100% 100%;
+				width: 45rpx;
+				height: 45rpx;
+			}
+			.do-minus {
+				background-image: url('~@/static/icon/minus.png');
+				background-size: 100% 100%;
+				width: 45rpx;
+				height: 45rpx;
+			}
+		}
+	}
   }
-
   .cate-two-box {
     width: 100%;
     padding: 0 10px;
+  }
+  
+  // 底部操作栏
+  .flow-fixed-footer {
+    position: fixed;
+    bottom: var(--window-bottom);
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #eee;
+    z-index: 11;
+    
+    .chackout-left {
+      font-size: 28rpx;
+      height: 98rpx;
+      color: #777;
+      flex: 4;
+      padding-left: 12px;
+  	  text-align: right;
+  	  padding-right: 40rpx;
+  	  .col-amount-do {
+  		font-size:35rpx;
+  		color:red;
+  		margin-top: 5rpx;
+  		margin-bottom:5rpx;
+  	  }
+    }
+    
+    .chackout-right {
+      font-size: 34rpx;
+      flex: 2;
+    }
+    
+    // 提交按钮
+    .flow-btn {
+      background: linear-gradient(to right, #f9211c, #ff6335);
+      color: #fff;
+      text-align: center;
+      line-height: 92rpx;
+      display: block;
+      font-size: 28rpx;
+       // 禁用按钮
+       &.disabled {
+         background: #ff9779;
+       }
+    }
   }
 </style>

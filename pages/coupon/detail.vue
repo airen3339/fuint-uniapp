@@ -107,9 +107,7 @@
 		   return false
 		} else {
 			app.$refs.givePopup.close()
-			const param = {'mobile': friendMobile,
-			               'couponId': this.userCouponId,
-						   'message': '转赠一张优惠券给你'}
+			const param = {'mobile': friendMobile, 'couponId': this.userCouponId, 'message': '转赠一张优惠券给你'}
 			giveApi.doGive(param)
 			  .then(result => {
 				  if (result.code == '200') {

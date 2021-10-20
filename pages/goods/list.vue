@@ -3,7 +3,7 @@
     :up="upOption" @up="upCallback">
     <!-- 页面头部 -->
     <view class="header">
-      <search class="search" :tips="options.search ? options.search : '搜索卡券'" @event="handleSearch" />
+      <search class="search" :tips="options.search ? options.search : '搜索商品'" @event="handleSearch" />
     </view>
 
     <!-- 排序标签 -->
@@ -12,10 +12,10 @@
         <text>综合</text>
       </view>
       <view class="sort-item" :class="{ active: sortType === 'sales' }" @click="handleSortType('sales')">
-        <text>领取数</text>
+        <text>销量</text>
       </view>
       <view class="sort-item sort-item-price" :class="{ active: sortType === 'price' }" @click="handleSortType('price')">
-        <text>面额</text>
+        <text>价格</text>
         <view class="price-arrow">
           <view class="icon up" :class="{ active: sortType === 'price' && !sortPrice }">
             <text class="iconfont icon-arrow-up"></text>
@@ -47,26 +47,20 @@
               </view>
               <view class="coupon-attr">
 				  <view class="attr-l">
-					  <!-- 卡券销量 -->
+					  <!-- 销量 -->
 					  <view class="desc-goods_sales dis-flex">
-					    <text>已领取{{ item.goods_sales }}张</text>
+					    <text>已售{{ item.goods_sales }}</text>
 					  </view>
-					  <!-- 卡券价格 -->
+					  <!-- 价格 -->
 					  <view class="desc_footer">
 					    <text class="price_x">¥{{ item.goods_price_min }}</text>
 					    <text class="price_y col-9" v-if="item.line_price_min > 0">¥{{ item.line_price_min }}</text>
 					  </view>
 				  </view>
 				  <view class="attr-r">
-					  <!--领券按钮-->
-					  <view class="receive" v-if="item.type === 'C'" @click="receive(item.goods_id)">
-						<text>立即领取</text>
-					  </view>
-					  <view v-else-if="item.type === 'P'" class="receive">
-						<text>立即预存</text>
-					  </view>
-					  <view v-else-if="item.type === 'T'" class="receive state">
-						<text>已领取</text>
+					  <!--购买按钮-->
+					  <view class="receive" @click="receive(item.goods_id)">
+						<text>立即购买</text>
 					  </view>
 				  </view>
               </view>

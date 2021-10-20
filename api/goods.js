@@ -2,8 +2,14 @@ import request from '@/utils/request'
 
 // api地址
 const api = {
-  list: 'goods/list',
-  detail: 'goods/detail'
+  cateList: 'goodsApi/cateList',
+  list: 'goodsApi/list',
+  detail: 'goodsApi/detail'
+}
+
+// 商品分类列表
+export const cateList = param => {
+  return request.get(api.cateList, param)
 }
 
 // 商品列表
