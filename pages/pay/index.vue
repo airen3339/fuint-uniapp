@@ -89,6 +89,7 @@
 				  app.exchangeNeedPoint = result.data.exchangeNeedPoint
 				  app.canUsePointAmount = result.data.canUsePointAmount
 				  app.payInfo.maxPoint = result.data.canUsePointAmount
+				  app.modifyUsePoint(app.payInfo.maxPoint)
 			  }
 		  })
 		  .catch(err => {
@@ -158,8 +159,8 @@
 			app.payInfo.payAmount = 0
 		}
 		
-		app.payInfo = { "remark": app.form.remark, "pointAmount": app.payInfo.pointAmount.toFixed(2), 
-		                "usePoint": app.payInfo.usePoint, "payAmount": app.payInfo.payAmount.toFixed(2),
+		app.payInfo = { "remark": app.form.remark, "pointAmount": parseFloat(app.payInfo.pointAmount).toFixed(2), 
+		                "usePoint": app.payInfo.usePoint, "payAmount": parseFloat(app.payInfo.payAmount).toFixed(2),
 						"maxPoint": app.payInfo.maxPoint }
 		
 		app.showPopup = !app.showPopup

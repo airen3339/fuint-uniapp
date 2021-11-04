@@ -4,7 +4,7 @@
       <view class="info-item">
         <view class="contacts">
           <text class="name">姓名</text>
-          <text class="value">{{userInfo.name ? userInfo.name : '未知'}}</text>
+          <text class="value">{{userInfo.name ? userInfo.name : '暂无'}}</text>
         </view>
       </view>
 	  <view class="info-item">
@@ -22,12 +22,12 @@
 	  <view class="info-item">
 	    <view class="contacts">
 	      <text class="name">生日</text>
-	      <text class="value">{{userInfo.birthday ? userInfo.birthday : '未知'}}</text>
+	      <text class="value">{{userInfo.birthday ? userInfo.birthday : '暂无'}}</text>
 	    </view>
 	  </view>
     </view>
     <!-- 底部操作按钮 -->
-    <view class="footer-fixed">
+    <view class="footer-fixed" v-if="userInfo.id">
       <view class="btn-wrapper">
         <view class="btn-item btn-item-main" @click="logout()">退出登录</view>
       </view>
