@@ -19,6 +19,5 @@ export const list = param => {
 
 // 商品详情
 export const detail = goodsId => {
-  return;
   return request.get(api.detail, { goodsId })
 }

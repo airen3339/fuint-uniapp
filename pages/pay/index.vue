@@ -239,13 +239,16 @@
 		margin-top: 30rpx;
   		margin-bottom: 20rpx;
   		width: 94%;
-		border-bottom: dashed 3rpx #cccccc;
   		display: inline-flex;
   	}
 	.amount {
 		font-weight: bold;
-		font-size: 72rpx;
+		font-size: 70rpx;
 		float: left;
+		min-width: 330rpx;
+		display: block;
+		height: 88rpx;
+		border-bottom: solid 1rpx #CCCCCC;
 	}
 	.amount-icon {
 		font-size: 38rpx;

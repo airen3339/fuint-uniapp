@@ -169,8 +169,8 @@
         this.$navTo('pages/settlement/goods', {
           mode: 'buyNow',
           goodsId: selectShop.goods_id,
-          skuId: selectShop.sku_id,
-          buyNum: selectShop.buy_num
+          goodsSkuId: selectShop.goods_sku_id,
+          goodsNum: selectShop.buy_num
         })
         // 隐藏当前弹窗
         this.onChangeValue(false)

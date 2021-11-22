@@ -3,7 +3,6 @@
 }
 
 /* 商品信息 */
-
 .goods-info {
   background: #fff;
   padding: 25rpx 30rpx;
@@ -109,10 +108,13 @@
 }
 
 /* 商品详情 */
-
 .goods-content .item-title {
-  padding: 26rpx 30rpx;
-  font-size: 28rpx;
+  padding: 20rpx;
+  font-size: 30rpx;
+}
+.goods-content .goods-content-detail {
+	padding: 20rpx;
+	min-height: 400rpx;
 }
 
 /* 底部操作栏 */
@@ -225,6 +227,6 @@
 
   // 购物车按钮
   .btn-item-deputy {
-    background: linear-gradient(to right, #ffa600, #ffbb00);
+    background: linear-gradient(to right, #00acac, #00acac);
   }
 }

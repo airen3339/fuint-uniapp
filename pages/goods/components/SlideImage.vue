@@ -4,7 +4,7 @@
     <swiper class="swiper-box" :autoplay="autoplay" :duration="duration" :indicator-dots="indicatorDots"
       :interval="interval" :circular="true" @change="setCurrent">
       <swiper-item v-for="(item, index) in images" :key="index" @click="onPreviewImages(index)">
-        <image class="slide-image" mode="aspectFill" :src="item.preview_url"></image>
+        <image class="slide-image" mode="aspectFill" :src="item"></image>
       </swiper-item>
     </swiper>
     <view class="banner-num">
@@ -46,7 +46,7 @@
         const app = this
         const imageUrls = []
         app.images.forEach(item => {
-          imageUrls.push(item.preview_url);
+          imageUrls.push(item);
         });
         uni.previewImage({
           current: imageUrls[index],
@@ -67,15 +67,14 @@
     .slide-image {
       width: 100%;
       height: 100%;
-      margin: 0 auto;
+      margin: 0rpx;
+	  padding: 0rpx;
       display: block;
-	  border-radius: 20rpx;
-	  border: solid 1rpx #cccccc;
+	  border-radius: 1rpx;
     }
   }
 
   /* banner计数 */
-
   .banner-num {
     position: absolute;
     right: 30rpx;

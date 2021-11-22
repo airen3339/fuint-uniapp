@@ -100,7 +100,7 @@
         height: 100%;
         margin: 0 auto;
         display: block;
-		border-radius: 20rpx;
+		border-radius: 10rpx;
 		border: solid 1rpx #cccccc;
       }
     }

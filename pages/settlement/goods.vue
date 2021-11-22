@@ -1,6 +1,6 @@
 <template>
   <view class="container p-bottom">
-    <!-- 清单列表 -->
+    <!-- 商品列表 -->
     <view class="m-top20">
       <view v-for="(item, index) in goodsCart" :key="index" class="checkout_list">
         <view class="flow-shopList dis-flex">
@@ -105,21 +105,21 @@
      * 生命周期函数--监听页面显示
      */
     onShow() {
-      // 获取购物车信息
-      this.getCartDetail()
+		const app = this
+		// 获取购物车信息
+        app.getCartDetail(app.options.goodsId, app.options.skuId, app.options.buyNum)
     },
 
     methods: {
       // 获取购物车信息
-      getCartDetail() {
+      getCartDetail(goodsId, skuId, buyNum) {
         const app = this
         return new Promise((resolve, reject) => {
-          CartApi.list()
+          CartApi.list(goodsId, skuId, buyNum)
             .then(result => {
 			  app.goodsCart = result.data.list
 			  app.totalNum = result.data.totalNum
 			  app.totalPrice = result.data.totalPrice
-			  
               resolve(result)
             })
             .catch(err => reject(err))
@@ -144,7 +144,7 @@
         // 按钮禁用
         app.disabled = true
         // 请求api
-        SettlementApi.submit(0, "", "goods", app.remark, 0, 0)
+        SettlementApi.submit(0, "", "goods", app.remark, 0, 0, app.options.goodsId, app.options.skuId, app.options.buyNum)
           .then(result => app.onSubmitCallback(result))
           .catch(err => {
             if (err.result) {

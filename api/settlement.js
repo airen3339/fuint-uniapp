@@ -7,8 +7,8 @@ const api = {
 }
 
 // 结算台订单提交
-export const submit = (targetId, selectNum, type, remark, payAmount, usePoint) => {
-  return request.post(api.submit, { targetId, selectNum, type, remark, payAmount, usePoint })
+export const submit = (targetId, selectNum, type, remark, payAmount, usePoint, goodsId, skuId, buyNum) => {
+  return request.post(api.submit, { targetId, selectNum, type, remark, payAmount, usePoint, goodsId, skuId, buyNum})
 }
 
 // 支付前查询

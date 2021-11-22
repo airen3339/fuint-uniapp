@@ -170,7 +170,7 @@
 	{ id: 'points', name: '我的积分', icon: 'jifen', type: 'link', url: 'pages/points/detail' },
     { id: 'help', name: '我的帮助', icon: 'bangzhu', type: 'link', url: 'pages/help/index' },
     { id: 'contact', name: '在线客服', icon: 'kefu', type: 'button', openType: 'contact' },
-	{ id: 'address', name: '联系地址', icon: 'shouhuodizhi', type: 'link', url: 'pages/address/index' },
+	{ id: 'address', name: '收货地址', icon: 'shouhuodizhi', type: 'link', url: 'pages/address/index' },
     { id: 'refund', name: '售后服务', icon: 'shouhou', type: 'link', url: 'pages/refund/index' },
 	{ id: 'setting', name: '个人信息', icon: 'shezhi1', type: 'link', url: 'pages/user/setting' },
   ]

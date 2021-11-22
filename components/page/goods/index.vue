@@ -1,55 +1,60 @@
 <template>
-  <!-- 卡券组 -->
+  <!-- 商品组 -->
   <view class="diy-goods" :style="{ background: itemStyle.background }">
     <view class="goods-list" :class="[`display__${itemStyle.display}`, `column__${itemStyle.column}`]">
       <scroll-view :scroll-x="itemStyle.display === 'slide'">
-        <view class="goods-item" v-for="(dataItem, index) in dataList" :key="index" @click="onTargetGoods(dataItem.goods_id, dataItem.type)">
-          <!-- 单列卡券 -->
-          <block>
+        <view class="goods-item" v-for="(dataItem, index) in dataList" :key="index" @click="onTargetGoods(dataItem.id)">
+
+          <!-- 单列商品 -->
+          <block v-if="itemStyle.column === 1">
             <view class="dis-flex">
               <!-- 商品图片 -->
               <view class="goods-item_left">
-                <image class="image" :src="dataItem.goods_image"></image>
+                <image class="image" :src="dataItem.logo"></image>
               </view>
               <view class="goods-item_right">
-                <!-- 卡券名称 -->
-                <view v-if="itemStyle.show.includes('goodsName')" class="goods-name twolist-hidden">
-                  <text>{{ dataItem.goods_name }}</text>
+                <!-- 商品名称 -->
+                <view v-if="itemStyle.show.includes('goodsName')" class="goods-name twoline-hide">
+                  <text>{{ dataItem.name }}</text>
                 </view>
                 <view class="goods-item_desc">
-                  <!-- 卡券卖点 -->
+                  <!-- 商品卖点 -->
                   <view v-if="itemStyle.show.includes('sellingPoint')" class="desc-selling_point dis-flex">
-                    <text class="onelist-hidden">{{ dataItem.selling_point }}</text>
+                    <text class="oneline-hide">{{ dataItem.salePoint }}</text>
                   </view>
-				  <view class="coupon-attr">
-					  <view class="attr-l">
-						  <!-- 卡券销量 -->
-						  <view v-if="itemStyle.show.includes('goodsSales')" class="desc-goods_sales dis-flex">
-							<text>已领取{{ dataItem.goods_sales }}张</text>
-						  </view>
-						  <!-- 卡券价格 -->
-						  <view class="desc_footer">
-							<text v-if="itemStyle.show.includes('goodsPrice')" class="price_x">¥{{ dataItem.goods_price_min }}</text>
-							<text class="price_y col-9" v-if="itemStyle.show.includes('linePrice') && dataItem.line_price_min > 0">¥{{ dataItem.line_price_min }}</text>
-						  </view>
-					  </view>
-					  <view class="attr-r">
-						  <!--领券按钮-->
-						  <view class="receive" v-if="dataItem.type === 'C'" @click="receive(dataItem.goods_id)">
-							<text>立即领取</text>
-						  </view>
-						  <view v-else-if="dataItem.type === 'P'" class="receive">
-						  	<text>立即预存</text>
-						  </view>
-						  <view v-else-if="dataItem.type === 'T'" class="receive state">
-							<text>已领取</text>
-						  </view>
-					  </view>
-				  </view>
+                  <!-- 商品销量 -->
+                  <view v-if="itemStyle.show.includes('goodsSales')" class="desc-goods_sales dis-flex">
+                    <text>已售{{ dataItem.initSale }}件</text>
+                  </view>
+                  <!-- 商品价格 -->
+                  <view class="desc_footer">
+                    <text v-if="itemStyle.show.includes('goodsPrice')" class="price_x">¥{{ dataItem.price }}</text>
+                    <text class="price_y col-9" v-if="itemStyle.show.includes('linePrice') && dataItem.linePrice > 0">¥{{ dataItem.linePrice }}</text>
+					<view class="buy-now">去购买</view>
+                  </view>
                 </view>
               </view>
             </view>
           </block>
+          <!-- 多列商品 -->
+          <block v-else>
+            <!-- 商品图片 -->
+            <view class="goods-image">
+              <image class="image" mode="aspectFill" :src="dataItem.logo"></image>
+            </view>
+            <view class="detail">
+              <!-- 商品标题 -->
+              <view v-if="itemStyle.show.includes('goodsName')" class="goods-name twoline-hide">
+                {{ dataItem.name }}
+              </view>
+              <!-- 商品价格 -->
+              <view class="detail-price oneline-hide">
+                <text v-if="itemStyle.show.includes('goodsPrice')" class="goods-price f-30 col-m">￥{{ dataItem.price }}</text>
+                <text v-if="itemStyle.show.includes('linePrice') && dataItem.linePrice > 0" class="line-price col-9 f-24">￥{{ dataItem.linePrice }}</text>
+              </view>
+            </view>
+          </block>
+
         </view>
       </scroll-view>
     </view>
@@ -76,20 +81,16 @@
      * 更新属性和数据的方法与更新页面数据的方法类似
      */
     methods: {
+
       /**
-       * 跳转卡券详情页
+       * 跳转商品详情页
        */
-      onTargetGoods(goodsId, type) {
-		  if (type === 'P') {
-			  this.$navTo(`pages/goods/detail`, { goodsId })
-		  } else {
-              return
-		  }
-      },
-	  receive(goods_id) {
-		  this.$success("领取成功！")
-	  }
+      onTargetGoods(goodsId) {
+        this.$navTo(`pages/goods/detail`, { goodsId })
+      }
+
     }
+
   }
 </script>
 
@@ -182,13 +183,13 @@
       &.column__1 {
         .goods-item {
           width: 100%;
-          height: 280rpx;
-          margin-bottom: 12rpx;
+          height: 250rpx;
+          margin-bottom: 10rpx;
           padding: 20rpx;
           box-sizing: border-box;
           background: #fff;
           line-height: 1.6;
-
+		  border: 1rpx #F5f5f5 solid;
           &:last-child {
             margin-bottom: 0;
           }
@@ -202,8 +203,10 @@
 
           .image {
             display: block;
-            width: 240rpx;
-            height: 240rpx;
+            width: 220rpx;
+            height: 200rpx;
+			border-radius: 10rpx;
+			border: 1rpx #cccccc solid;
           }
         }
 
@@ -213,26 +216,16 @@
 
           .goods-name {
             margin-top: 20rpx;
-            height: 64rpx;
+            height: 49rpx;
             line-height: 1.3;
             white-space: normal;
             color: #484848;
-            font-size: 26rpx;
+            font-size: 30rpx;
           }
         }
 
         .goods-item_desc {
-          margin-top: 8rpx;
-		  .coupon-attr {
-			 .attr-l {
-				 float:left;
-				 width: 60%;
-			 }
-			 .attr-r {
-				 margin-top:20rpx;
-				 float:left;
-			 }
-		  }
+          margin-top: 0rpx;
         }
 
         .desc-selling_point {
@@ -240,22 +233,6 @@
           font-size: 24rpx;
           color: #e49a3d;
         }
-		.receive {
-		  height: 46rpx;
-		  width: 128rpx;
-		  line-height: 46rpx;
-		  text-align: center;
-		  border: 1px solid #f8df00;
-		  border-radius: 20rpx;
-		  color: #f86d48;
-		  background: #f8df98;
-		  font-size: 22rpx;
-		  &.state {
-		    border: none;
-			color: #cccccc;
-			background: #F5F5F5;
-		  }
-		}
 
         .desc-goods_sales {
           color: #999;
@@ -268,12 +245,23 @@
           .price_x {
             margin-right: 16rpx;
             color: #f03c3c;
-            font-size: 30rpx;
+            font-size: 36rpx;
           }
 
           .price_y {
             text-decoration: line-through;
           }
+		  
+		  .buy-now {
+			  color: #FFFFFF;
+			  float: right;
+			  margin-right: 20rpx;
+			  border: solid 1rpx #00acac;
+			  background: #00acac;
+			  padding: 8rpx 20rpx 8rpx 20rpx;
+			  border-radius: 26rpx;
+			  display: block;
+		  }
         }
       }
     }

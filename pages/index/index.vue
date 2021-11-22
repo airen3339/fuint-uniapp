@@ -16,7 +16,7 @@
 	      <Blank :itemStyle="options.blankStyle" />
 	  </block>
 	  <block>
-	      <Coupon :itemStyle="options.goodsStyle" :params="options.goodsParams" :dataList="coupon" />
+	      <Goods :itemStyle="options.goodsStyle" :params="options.goodsParams" :dataList="goods" />
 	  </block>
   </view>
 </template>
@@ -27,7 +27,7 @@
   import Banner from '@/components/page/banner'
   import NavBar from '@/components/page/navBar'
   import Blank from '@/components/page/blank'
-  import Coupon from '@/components/page/coupon'
+  import Goods from '@/components/page/goods'
   import * as Api from '@/api/page'
 
   const App = getApp()
@@ -38,7 +38,7 @@
 	   Banner,
 	   NavBar,
 	   Blank,
-	   Coupon
+	   Goods
 	},
     data() {
       return {
@@ -48,7 +48,7 @@
 				"searchStyle": "radius",
 			},
 			"searchParam": {
-				"placeholder": "搜索卡券",
+				"placeholder": "搜索关键字",
 			},
 			"blankStyle": {
 				"height": "5",
@@ -65,22 +65,22 @@
 						"imgUrl": "/static/nav/3.png",
 						"imgName": "icon-1.png",
 						"linkUrl": "pages\/coupon\/list?type=C&needPoint=1",
-						"text": "积分兑换",
+						"text": "积分换券",
 						"tip": "积分换好礼",
 						"color": "#666666"
 					}, {
 						"imgUrl": "/static/nav/2.png",
 						"imgName": "icon-1.png",
 						"linkUrl": "pages\/coupon\/list?type=P",
-						"text": "充值赠送",
+						"text": "预存充值",
 						"tip": "充值有优惠",
 						"color": "#666666",
 					}, {
 						"imgUrl": "/static/nav/4.png",
 						"imgName": "icon-1.png",
 						"linkUrl": "pages\/coupon\/list?type=T",
-						"text": "等级特权",
-						"tip": "升级有特权",
+						"text": "热门活动",
+						"tip": "抽奖、集次等等",
 						"color": "#666666"}],
 			"goodsStyle": {
 				"background": "#F6F6F6",
@@ -109,7 +109,7 @@
 			}
 		},
         banner: [],
-		coupon: []
+		goods: []
 		}
 	},
 
@@ -137,7 +137,7 @@
 		  Api.home()
 		    .then(result => {
 		      app.banner = result.data.banner
-			  app.coupon = result.data.coupon.content
+			  app.goods = result.data.goods
 		    })
 		    .finally(() => callback && callback())
 		},
@@ -159,7 +159,7 @@
     onShareAppMessage() {
       const app = this
       return {
-         title: "FuInt会员卡券",
+         title: "FuInt会员系统",
          path: "/pages/index/index?" + app.$getShareUrlParams()
       }
     },

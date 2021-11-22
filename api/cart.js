@@ -7,11 +7,11 @@ const api = {
 }
 
 // 购物车列表
-export const list = () => {
-  return request.get(api.list, {}, { load: false })
+export const list = (goodsId, skuId, buyNum) => {
+  return request.post(api.list, { goodsId, skuId, buyNum })
 }
 
 // 更新购物车
-export const save = (goodsId, action) => {
-  return request.post(api.save, { goodsId, action })
+export const save = (goodsId, action, skuId, buyNum) => {
+  return request.post(api.save, { goodsId, action, skuId, buyNum })
 }

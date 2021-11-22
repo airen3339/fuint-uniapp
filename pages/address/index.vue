@@ -33,7 +33,7 @@
         </view>
       </view>
     </view>
-    <empty v-if="!list.length" :isLoading="isLoading" tips="亲，暂无收货地址" />
+    <empty v-if="!list.length" :isLoading="isLoading" tips="您暂无收货地址哦"/>
     <!-- 底部操作按钮 -->
     <view class="footer-fixed">
       <view class="btn-wrapper">
@@ -86,7 +86,7 @@
       getPageData() {
         const app = this
         app.isLoading = true
-        Promise.all([app.getDefaultId(), app.getAddressList()])
+        Promise.all([app.getAddressList()])
           .then(() => {
             // 列表排序把默认收货地址放到最前
             app.onReorder()
@@ -101,19 +101,6 @@
           AddressApi.list()
             .then(result => {
               app.list = result.data.list
-              resolve(result)
-            })
-            .catch(err => reject(err))
-        })
-      },
-
-      // 获取默认的收货地址
-      getDefaultId() {
-        return new Promise((resolve, reject) => {
-          const app = this
-          AddressApi.defaultId()
-            .then(result => {
-              app.defaultId = result.data.defaultId
               resolve(result)
             })
             .catch(err => reject(err))
@@ -262,9 +249,7 @@
         }
       }
     }
-
   }
-
 
   // 底部操作栏
   .footer-fixed {

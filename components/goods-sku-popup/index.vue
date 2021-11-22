@@ -214,12 +214,12 @@
       // 立即购买按钮的背景颜色
       buyNowBackgroundColor: {
         Type: String,
-       default: "linear-gradient(to right, #f9211c, #ff6335)"
+       default: "linear-gradient(to right, #00acac, #00acac)"
       },
       // 加入购物车按钮的文字
       addCartText: {
         Type: String,
-        default: "加入卡券包"
+        default: "加入购物车"
       },
       // 加入购物车按钮的字体颜色
       addCartColor: {
@@ -229,7 +229,7 @@
       // 加入购物车按钮的背景颜色
       addCartBackgroundColor: {
         Type: String,
-        default: "linear-gradient(to right, #ffa600, #ffbb00)"
+        default: "linear-gradient(to right, #00acac, #00acac)"
       },
       // 不可点击时,按钮的样式
       disableStyle: {
@@ -352,12 +352,12 @@
         let skuListName = that.skuListName;
         if (that.customAction && typeof(that.customAction) === 'function') {
           let goodsInfo = await that.customAction();
-          // console.log("goodsInfo",goodsInfo);
+           console.log("goodsInfo",goodsInfo);
           if (goodsInfo && typeof goodsInfo == "object" && JSON.stringify(goodsInfo) != "{}") {
             findGoodsInfoRun = false;
             that.updateGoodsInfo(goodsInfo);
           } else {
-            that.toast("未获取到商品信息");
+            that.toast("无法获取到商品信息");
             that.$emit("input", false);
             return false;
           }

@@ -75,7 +75,7 @@
 	  text-align: left;
 	  padding-left: 20rpx;
 	  .text {
-		  font-size: 30rpx;
+		  font-size: 32rpx;
 	  }
 	  .tip {
 		  font-size: 22rpx;

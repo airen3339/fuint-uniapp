@@ -2,9 +2,13 @@
   <view class="shortcut" :style="{ right: right, bottom: bottom }">
 
     <!-- 首页 -->
-    <view class="nav-item" :class="[isShow ? 'show_40' : (transparent ? '' : 'hide_40')]" @click="onTargetPage(0)">
+    <view class="nav-item" :class="[isShow ? 'show_60' : (transparent ? '' : 'hide_60')]" @click="onTargetPage(0)">
       <text class="iconfont icon-home"></text>
     </view>
+	
+	<view class="nav-item" :class="[isShow ? 'show_40' : (transparent ? '' : 'hide_40')]" @click="onTargetPage(1)">
+	  <text class="iconfont icon-cate"></text>
+	</view>
 	
     <!-- 个人中心 -->
     <view class="nav-item" :class="[isShow ? 'show_20' : (transparent ? '' : 'hide_20')]" @click="onTargetPage(3)">

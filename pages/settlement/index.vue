@@ -164,7 +164,7 @@
         // 按钮禁用
         app.disabled = true
         // 请求api
-        SettlementApi.submit(app.couponId, app.selectNum, "prestore", app.remark, 0, 0)
+        SettlementApi.submit(app.couponId, app.selectNum, "prestore", app.remark, 0, 0, 0, 0, 0)
           .then(result => app.onSubmitCallback(result))
           .catch(err => {
             if (err.result) {

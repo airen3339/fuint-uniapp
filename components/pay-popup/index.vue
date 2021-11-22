@@ -123,7 +123,7 @@
       payNow() {
 		const app = this
 		// 请求api
-		SettlementApi.submit(0, "", "payment", app.payInfo.remark, app.payInfo.payAmount, app.payInfo.usePoint)
+		SettlementApi.submit(0, "", "payment", app.payInfo.remark, app.payInfo.payAmount, app.payInfo.usePoint, 0, 0, 0)
 		  .then(result => app.onSubmitCallback(result))
 		  .catch(err => {
 		    if (err.result) {

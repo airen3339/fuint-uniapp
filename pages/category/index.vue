@@ -33,7 +33,7 @@
               <view class="cate-cont-box">
                 <view class="flex-five item" v-for="(item, idx) in list[curIndex].goodsList" :key="idx">
                   <view class="cate-img">
-                    <image v-if="item.logo" :src="item.logo"></image>
+                    <image v-if="item.logo" :src="item.logo" @click="onTargetGoods(item.id)"></image>
                   </view>
 				  <view class="cate-info">
                     <text class="name text">{{ item.name }}</text>
@@ -41,9 +41,15 @@
 				    <view class="action">
 						<text class="price">￥{{ item.price }}</text>
 						<view class="cart">
-						    <view class="ii do-minus" v-if="item.buyNum" @click="onSaveCart(item.id, '-')"></view>
-							<view class="ii num" v-if="item.buyNum">{{ (item.buyNum != undefined) ? item.buyNum : 0 }}</view>
-							<view class="ii do-add" v-if="item.stock > 0" @click="onSaveCart(item.id, '+')"></view>
+							<view v-if="item.isSingleSpec === 'Y'" class="singleSpec">
+								<view class="ii do-minus" v-if="item.buyNum" @click="onSaveCart(item.id, '-')"></view>
+								<view class="ii num" v-if="item.buyNum">{{ (item.buyNum != undefined) ? item.buyNum : 0 }}</view>
+								<view class="ii do-add" v-if="item.stock > 0" @click="onSaveCart(item.id, '+')"></view>
+							</view>
+							<view v-if="item.isSingleSpec === 'N'" class="multiSpec">
+								<text class="num-badge" v-if="item.buyNum">{{ item.buyNum }}</text>
+								<view class="select-spec" @click="onShowSkuPopup(2, item.id)">选规格</view>
+							</view>
 						</view>
 					</view>
 				  </view>
@@ -55,6 +61,9 @@
       </scroll-view>
     </view>
 	
+	<!-- 商品SKU弹窗 -->
+	<SkuPopup v-if="!isLoading" v-model="showSkuPopup" :skuMode="skuMode" :goods="goods" @addCart="onAddCart"/>
+	
 	<view class="flow-fixed-footer b-f m-top10">
 	  <view class="dis-flex chackout-box">
 	    <view class="chackout-left pl-12">
@@ -62,7 +71,7 @@
 		  <view class="col-amount-view">共计：{{ totalNum }} 件</view>
 	    </view>
 	    <view class="chackout-right" @click="doSubmit()">
-	      <view class="flow-btn f-32">选好了</view>
+	      <view class="flow-btn f-32">去结算</view>
 	    </view>
 	  </view>
 	</view>
@@ -78,12 +87,14 @@
   import * as GoodsApi from '@/api/goods'
   import Search from '@/components/search'
   import Empty from '@/components/empty'
+  import SkuPopup from './components/SkuPopup'
 
   const App = getApp()
 
   export default {
     components: {
       Search,
+	  SkuPopup,
       Empty
     },
     data() {
@@ -102,7 +113,10 @@
         // 分类模板设置
         templet: {'style': 20},
         // 正在加载中
-        isLoading: true
+        isLoading: true,
+		showSkuPopup: false,
+		skuMode: 1,
+		goods: {}
       }
     },
 
@@ -127,10 +141,8 @@
     },
 
     methods: {
-
       /**
        * 获取页面数据
-	   * 
        */
       getPageData() {
         const app = this
@@ -153,18 +165,27 @@
 			  app.list.forEach(function(item, index) {
 				  let total = 0
 				  item.goodsList.forEach(function(goods, key) {
+					  let totalBuyNum = 0
 					  app.goodsCart.forEach(function(cart){
 						 if (goods.id == cart.goodsId) {
-							app.$set(app.list[index].goodsList[key], 'buyNum', cart.num)
 							total = total + cart.num
+							totalBuyNum = totalBuyNum + cart.num
 							app.totalPrice = app.totalPrice + (goods.price * cart.num)
 						 } 
 					  })
+					  app.$set(app.list[index].goodsList[key], 'buyNum', totalBuyNum)
 				  })
 				  app.$set(app.list[index], 'total', total)
 			  })
 		  })
       },
+	  
+	  /**
+	   * 跳转商品详情
+	   */
+	  onTargetGoods(goodsId) {
+	    this.$navTo(`pages/goods/detail`, { goodsId })
+	  },
 
       /**
        * 设置分类列表高度
@@ -194,7 +215,11 @@
 			  app.getPageData()
 		  })
 	  },
-	  
+	  // 更新购物车数量
+	  onAddCart(total) {
+	    this.getPageData()
+		this.$error("添加购物车成功")
+	  },
 	  // 结算
 	  doSubmit() {
 		  if (this.totalPrice > 0) {
@@ -202,7 +227,33 @@
 		  } else {
 			 this.$error("请先选择商品")
 		  }
-	  }
+	  },
+	  onShowSkuPopup(skuMode, goodsId) {
+		const app = this
+		app.isLoading = true
+		return new Promise((resolve, reject) => {
+		  GoodsApi.detail(goodsId)
+		    .then(result => {
+			  const goodsData = result.data
+			  
+			  goodsData.skuList.forEach(function(sku, index) {
+				goodsData.skuList[index].specIds = sku.specIds.split('-')
+				goodsData.skuList[index].skuId = sku.id
+			  })
+			  
+			  app.goods = goodsData
+			  app.skuMode = skuMode
+			  app.showSkuPopup = !app.showSkuPopup
+			  
+			  console.log(app.skuMode)
+			  
+			  app.isLoading = false
+			  
+		      resolve(result)
+		    })
+		    .catch(err => reject(err))
+		})
+	  },
     },
 
     /**
@@ -307,7 +358,7 @@
 	  margin-right: 5rpx;
 	  font-size: 18rpx;
 	  background: red;
-	  z-index: 999999;
+	  z-index: 999;
 	  text-align: center;
 	  line-height: 28rpx;
 	  color: #ffffff;
@@ -426,6 +477,30 @@
 				width: 45rpx;
 				height: 45rpx;
 			}
+			.multiSpec {
+				.num-badge {
+					position: absolute;
+					margin-top: 10rpx;
+					margin-right: 0rpx;
+					font-size: 18rpx;
+					background: red;
+					text-align: center;
+					line-height: 28rpx;
+					color: #ffffff;
+					border-radius: 100%;
+					min-height: 30rpx;
+					min-width: 30rpx;
+					padding: 1rpx;
+				}
+				.select-spec {
+					border: solid 1rpx #00acac;
+					padding: 10rpx 20rpx 10rpx 30rpx;
+					font-size: 25rpx;
+					border-radius: 26rpx;
+					color: #ffffff;
+					background: #00acac;
+				}
+			}
 		}
 	}
   }
@@ -466,7 +541,7 @@
     
     // 提交按钮
     .flow-btn {
-      background: linear-gradient(to right, #f9211c, #ff6335);
+      background: linear-gradient(to right, #00acac, #00acac);
       color: #fff;
       text-align: center;
       line-height: 92rpx;
