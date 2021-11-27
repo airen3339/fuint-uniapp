@@ -340,8 +340,7 @@
           that.init();
         }
         // 更新选中sku的库存信息
-        let select_sku_info = that.getListItem(that.goodsInfo[skuListName], that.skuIdName, that.selectShop[
-          that.skuIdName]);
+        let select_sku_info = that.getListItem(that.goodsInfo[skuListName], that.skuIdName, that.selectShop[that.skuIdName]);
         Object.assign(that.selectShop, select_sku_info);
         that.complete = true;
         that.$emit("open", true);
@@ -352,7 +351,7 @@
         let skuListName = that.skuListName;
         if (that.customAction && typeof(that.customAction) === 'function') {
           let goodsInfo = await that.customAction();
-           console.log("goodsInfo",goodsInfo);
+          console.log("goodsInfo",goodsInfo);
           if (goodsInfo && typeof goodsInfo == "object" && JSON.stringify(goodsInfo) != "{}") {
             findGoodsInfoRun = false;
             that.updateGoodsInfo(goodsInfo);
@@ -390,6 +389,7 @@
             that.$set(that.selectArr, index1, '');
             that.$set(that.subIndex, index1, -1);
           }
+		  
           that.checkInpath(index1);
           // 如果全部选完
           that.checkSelectShop();
@@ -483,6 +483,7 @@
       // 检测sku选项是否已全部选完,且有库存
       checkSelectComplete(obj = {}) {
         let selectShop = that.selectShop;
+		console.log(selectShop)
         if (selectShop && selectShop[that.skuIdName]) {
           // 判断库存
           if (that.selectNum <= selectShop[that.stockName]) {
@@ -543,6 +544,7 @@
         let specListArr = that.goodsInfo[that.specListName];
         if (specListArr.length == 1) {
           let specList = specListArr[0].list;
+		
           for (let i = 0; i < specList.length; i++) {
             let sku = that.getListItem(skuList, that.skuArrName, [specList[i].name]);
             if (sku) {
@@ -568,7 +570,7 @@
         if (typeof n == "string") {
           n = parseFloat(n)
         }
-        return n.toFixed(2)
+        return n ? n.toFixed(2) : n
       }
     },
     // 计算属性

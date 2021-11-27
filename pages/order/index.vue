@@ -320,7 +320,7 @@
       onSubmitCallback(result) {
         const app = this
         // 发起微信支付
-        if (result.data.pay_type == PayTypeEnum.WECHAT.value) {
+        if (result.data.payType == PayTypeEnum.WECHAT.value) {
           wxPayment(result.data.payment)
             .then(() => {
               app.$success('支付成功')

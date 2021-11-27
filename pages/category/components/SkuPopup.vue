@@ -76,19 +76,21 @@
         const app = this
         const { goods: { name, logo, skuList } } = app
         const skuData = []
-        skuList.forEach(item => {
-          skuData.push({
-            _id: item.id,
-            sku_id: item.skuId,
-            goods_id: item.goodsId,
-            name: name,
-            image: item.logo ? item.logo : logo,
-            price: item.price,
-            stock: item.stock,
-            spec_value_ids: item.specIds,
-            sku_name_arr: app.getSkuNameArr(item.specIds)
-          })
-        })
+		if (skuList) {
+			skuList.forEach(item => {
+			  skuData.push({
+				_id: item.id,
+				sku_id: item.skuId,
+				goods_id: item.goodsId,
+				name: name,
+				image: item.logo ? item.logo : logo,
+				price: item.price,
+				stock: item.stock,
+				spec_value_ids: item.specIds,
+				sku_name_arr: app.getSkuNameArr(item.specIds)
+			  })
+			})
+		}
         return skuData
       },
 
@@ -121,16 +123,18 @@
         const { goods: { specList } } = this
         const defaultData = [{ name: '默认', list: [{ name: '默认' }] }]
         const specData = []
-        specList.forEach(group => {
-          const children = []
-          group.valueList.forEach(specValue => {
-            children.push({ name: specValue.specValue })
-          })
-          specData.push({
-            name: group.specName,
-            list: children
-          })
-        })
+		if (specList) {
+			specList.forEach(group => {
+			  const children = []
+			  group.valueList.forEach(specValue => {
+				children.push({ name: specValue.specValue })
+			  })
+			  specData.push({
+				name: group.specName,
+				list: children
+			  })
+			})
+		}
         return specData.length ? specData : defaultData
       },
 

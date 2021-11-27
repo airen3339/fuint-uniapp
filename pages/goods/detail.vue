@@ -217,7 +217,7 @@
       // 更新购物车数量
       onAddCart(total) {
         this.cartTotal = total
-		this.$error("添加购物车成功")
+		this.$toast("添加购物车成功")
       },
 
       /**

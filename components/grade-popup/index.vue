@@ -123,7 +123,7 @@
       buyNow() {
 		const app = this
 		// 请求api
-		SettlementApi.submit(app.memberGrade.id, "", "member", "", "", 0, 0, 0, 0)
+		SettlementApi.submit(app.memberGrade.id, "", "member", "", "", 0, 0, 0, 0, "")
 		  .then(result => app.onSubmitCallback(result))
 		  .catch(err => {
 		    if (err.result) {

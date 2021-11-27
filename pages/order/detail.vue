@@ -7,42 +7,59 @@
         <view class="status-icon">
           <!-- 进行中的订单 -->
           <block>
-            <!-- 待支付 -->
-            <block>
-              <image v-if="order.status == OrderStatusEnum.CREATED.value" class="image" src="/static/order/status/wait_pay.png" mode="aspectFit"></image>
-            </block>
-          </block>
-          <!-- 已支付 -->
-          <block>
-            <image v-if="order.status == OrderStatusEnum.PAID.value" class="image" src="/static/order/status/received.png" mode="aspectFit"></image>
-          </block>
-          <!-- 已取消-->
-          <block>
-            <image v-if="order.status == OrderStatusEnum.CANCEL.value" class="image" src="/static/order/status/close.png" mode="aspectFit"></image>
-          </block>
+              <!-- 待支付 -->
+              <block>
+                 <image v-if="order.status == OrderStatusEnum.CREATED.value" class="image" src="/static/order/status/wait_pay.png" mode="aspectFit"></image>
+              </block>
+			  <!-- 已支付 -->
+			  <block>
+				<image v-if="order.status == OrderStatusEnum.PAID.value" class="image" src="/static/order/status/received.png" mode="aspectFit"></image>
+			  </block>
+			  <!-- 待发货 -->
+			  <block>
+				<image v-if="order.status == OrderStatusEnum.DELIVERY.value" class="image" src="/static/order/status/wait_deliver.png" mode="aspectFit"></image>
+			  </block>
+			  <!-- 已发货 -->
+			  <block>
+				<image v-if="order.status == OrderStatusEnum.DELIVERED.value" class="image" src="/static/order/status/wait_receipt.png" mode="aspectFit"></image>
+			  </block>
+			  <!-- 已收货-->
+			  <block>
+				<image v-if="order.status == OrderStatusEnum.RECEIVED.value" class="image" src="/static/order/status/received.png" mode="aspectFit"></image>
+			  </block>
+			  <!-- 已取消-->
+			  <block>
+				<image v-if="order.status == OrderStatusEnum.CANCEL.value" class="image" src="/static/order/status/close.png" mode="aspectFit"></image>
+			  </block>
+		    </block>
         </view>
         <view class="status-text">
           <text v-if="order.status == OrderStatusEnum.CREATED.value">{{OrderStatusEnum.CREATED.name}}</text>
 		  <text v-else-if="order.status == OrderStatusEnum.PAID.value">{{OrderStatusEnum.PAID.name}}</text>
+		  <text v-else-if="order.status == OrderStatusEnum.DELIVERY.value">{{OrderStatusEnum.DELIVERY.name}}</text>
+		  <text v-else-if="order.status == OrderStatusEnum.DELIVERED.value">{{OrderStatusEnum.DELIVERED.name}}</text>
+		  <text v-else-if="order.status == OrderStatusEnum.RECEIVED.value">{{OrderStatusEnum.RECEIVED.name}}</text>
 		  <text v-else-if="order.status == OrderStatusEnum.CANCEL.value">{{OrderStatusEnum.CANCEL.name}}</text>
         </view>
       </view>
-      <!-- 下一步操作 -->
-      <view class="next-action" v-if="order.status == OrderStatusEnum.CREATED.value">
-        <view class="action-btn" @click="onPay(order.id)">去支付</view>
-      </view>
-    </view>
-
-    <view class="delivery-address i-card">
-      <view class="link-man">
-        <text class="name">{{order.userInfo.name}}</text>
-        <text class="phone">{{order.userInfo.mobile}}</text>
-      </view>
     </view>
 	
+	<!--订单类型-->
 	<view class="order-type">
 	    <text class="type">{{ order.typeName }}</text>
 	</view>
+
+    <!-- 快递配送：配送地址 -->
+    <view v-if="order.address" class="delivery-address i-card">
+      <view class="link-man">
+    	<text class="name">{{ order.address.name }}</text>
+    	<text class="phone">{{ order.address.mobile }}</text>
+      </view>
+      <view class="address">
+    	<text class="region">{{ order.address.provinceName }}{{ order.address.cityName }}{{ order.address.regionName }}</text>
+    	<text class="detail">{{ order.address.detail }}</text>
+      </view>
+    </view>
 
     <!-- 商品列表 -->
     <view class="goods-list i-card" v-if="order.goods.length > 0">
@@ -130,6 +147,13 @@
         </block>
       </view>
     </view>
+	<view class="footer-fixed" v-if="order.status == OrderStatusEnum.DELIVERED.value">
+	  <view class="btn-wrapper">
+		<block>
+		  <view class="btn-item active" @click="onReceipt(order.id)">确认收货</view>
+		</block>
+	  </view>
+	</view>
 
     <!-- 支付方式弹窗 -->
     <u-popup v-model="showPayPopup" mode="bottom" border-radius="26" :closeable="true">
@@ -284,6 +308,26 @@
         // 显示支付方式弹窗
         this.showPayPopup = true
       },
+	  
+	  // 确认收货
+	  onReceipt(orderId) {
+		  const app = this
+		  uni.showModal({
+			title: '友情提示',
+			content: '确认收到商品了吗？',
+			success(o) {
+			  if (o.confirm) {
+				OrderApi.receipt(orderId)
+				  .then(result => {
+					// 显示成功信息
+					app.$success(result.message)
+					// 刷新当前订单数据
+					app.getOrderDetail()
+				  })
+			  }
+			}
+		  });
+	   },
 
       // 选择支付方式
       onSelectPayType(payType) {
@@ -300,7 +344,7 @@
       onSubmitCallback(result) {
         const app = this
         // 发起微信支付
-        if (result.data.pay_type == PayTypeEnum.WECHAT.value) {
+        if (result.data.payType == PayTypeEnum.WECHAT.value) {
           wxPayment(result.data.payment)
             .then(() => {
               app.$success('支付成功')
@@ -379,17 +423,17 @@
       height: 128rpx;
 
       .action-btn {
-        min-width: 152rpx;
-        height: 56rpx;
+        min-width: 150rpx;
+        height: 60rpx;
         padding: 0 30rpx;
-        line-height: 56rpx;
-        background-color: #fff;
+        line-height: 60rpx;
         text-align: center;
-        border-radius: 20rpx;
-        border-color: rgb(102, 102, 102);
+        border-radius: 30rpx;
+        border-color: #ffffff;
+		color: #ffffff;
+		background: linear-gradient(to right, #f9211c, #ff6335);
         cursor: pointer;
         user-select: none;
-        color: #f03c3c;
       }
     }
   }
@@ -403,10 +447,16 @@
     margin: 0 auto 20rpx auto;
     border-radius: 20rpx;
   }
+  
+  // 订单类型
+  .order-type {
+    font-weight: bold;
+    margin: 25rpx;
+  }
 
   // 收货地址
   .delivery-address {
-    margin-top: -50rpx;
+    margin-top: 20rpx;
 
     .link-man {
       line-height: 46rpx;
@@ -427,11 +477,6 @@
       }
     }
 
-  }
-  
-  .order-type {
-    font-weight: bold;
-    margin: 23rpx;
   }
 
   // 物流公司

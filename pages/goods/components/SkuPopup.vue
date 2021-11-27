@@ -89,6 +89,7 @@
             sku_name_arr: app.getSkuNameArr(item.specIds)
           })
         })
+		
         return skuData
       },
 
@@ -97,13 +98,17 @@
         const app = this
         const defaultData = ['默认']
         const skuNameArr = []
-        if (specValueIds) {
+		
+        if (specValueIds != "" && specValueIds.length > 1) {
           specValueIds.forEach((valueId, specId) => {
             const specValueName = app.getSpecValueName(valueId, specId)
             skuNameArr.push(specValueName)
           })
         }
-        return skuNameArr.length ? skuNameArr : defaultData
+		
+        const result = skuNameArr.length ? skuNameArr : defaultData
+		
+		return result
       },
 
       // 获取指定的规格值名称
@@ -120,18 +125,26 @@
       getSpecList() {
         const { goods: { specList } } = this
         const defaultData = [{ name: '默认', list: [{ name: '默认' }] }]
+		
+		console.log(specList)
+		
         const specData = []
-        specList.forEach(group => {
-          const children = []
-          group.valueList.forEach(specValue => {
-            children.push({ name: specValue.specValue })
-          })
-          specData.push({
-            name: group.specName,
-            list: children
-          })
-        })
-        return specData.length ? specData : defaultData
+		if (specList.length > 1) {
+			specList.forEach(group => {
+			  const children = []
+			  group.valueList.forEach(specValue => {
+				children.push({ name: specValue.specValue })
+			  })
+			  specData.push({
+				name: group.specName,
+				list: children
+			  })
+			})
+		}
+		
+        const result = specData.length ? specData : defaultData
+		
+		return result
       },
 
       // sku组件 开始-----------------------------------------------------------

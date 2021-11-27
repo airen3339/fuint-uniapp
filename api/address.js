@@ -3,12 +3,8 @@ import request from '@/utils/request'
 // api地址
 const api = {
   list: 'address/list',
-  defaultId: 'address/defaultId',
   detail: 'address/detail',
-  add: 'address/add',
-  edit: 'address/edit',
-  setDefault: 'address/setDefault',
-  remove: 'address/remove'
+  save: 'address/save'
 }
 
 // 收货地址列表
@@ -26,22 +22,17 @@ export const detail = (addressId) => {
   return request.get(api.detail, { addressId })
 }
 
-// 新增收货地址
-export const add = (data) => {
-  return request.post(api.add, { form: data })
-}
-
-// 编辑收货地址
-export const edit = (addressId, data) => {
-  return request.post(api.edit, { addressId, form: data })
+// 保存收货地址
+export const save = (name, mobile, provinceId, cityId, regionId, detail, status, addressId) => {
+  return request.post(api.save, { name, mobile, provinceId, cityId, regionId, detail, status, addressId })
 }
 
 // 设置默认收货地址
-export const setDefault = (addressId) => {
-  return request.post(api.setDefault, { addressId })
+export const setDefault = (addressId, isDefault) => {
+  return request.post(api.save, { addressId, isDefault})
 }
 
 // 删除收货地址
-export const remove = (addressId) => {
-  return request.post(api.remove, { addressId })
+export const remove = (addressId, status) => {
+  return request.post(api.save, { addressId, status })
 }

@@ -111,7 +111,7 @@
         const app = this
         AddressApi.detail(app.addressId)
           .then(result => {
-            const detail = result.data.detail
+            const detail = result.data.address
             app.createFormData(detail)
           })
       },
@@ -120,21 +120,21 @@
       createFormData(detail) {
         const { form } = this
         form.name = detail.name
-        form.phone = detail.phone
+        form.phone = detail.mobile
         form.detail = detail.detail
         form.region = this.createRegion(detail)
       },
 
       createRegion(detail) {
         return [{
-          label: detail.region.province,
-          value: detail.province_id
+          label: detail.provinceName,
+          value: detail.provinceId
         }, {
-          label: detail.region.city,
-          value: detail.city_id
+          label: detail.cityName,
+          value: detail.cityId
         }, {
-          label: detail.region.region,
-          value: detail.region_id
+          label: detail.regionName,
+          value: detail.regionId
         }]
       },
 
@@ -147,7 +147,7 @@
         app.$refs.uForm.validate(valid => {
           if (valid) {
             app.disabled = true
-            AddressApi.edit(app.addressId, app.form)
+            AddressApi.save(app.form.name, app.form.phone, app.form.region[0].value, app.form.region[1].value, app.form.region[2].value, app.form.detail, 'A', app.addressId)
               .then(result => {
                 app.$toast(result.message)
                 uni.navigateBack()

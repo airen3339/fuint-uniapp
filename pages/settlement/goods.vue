@@ -1,5 +1,37 @@
 <template>
   <view class="container p-bottom">
+	<view class="flow-mode">
+		<selectSwitch :switchList="orderModeList" checked_bj_color="#00acac" @change="switchMode"/> 
+	</view>
+	<!-- 快递配送：配送地址 -->
+	<view @click="onSelectAddress" class="flow-delivery">
+	  <view class="flow-delivery__detail dis-flex flex-y-center">
+		<view class="detail-location dis-flex">
+		  <text class="iconfont icon-dingwei"></text>
+		</view>
+		<view class="detail-content flex-box">
+		  <block v-if="address.name">
+			<view class="detail-content__title dis-flex">
+			  <text class="f-30">{{ address.name }}</text>
+			  <text class="detail-content__title-phone f-28">{{ address.mobile }}</text>
+			</view>
+			<view class="address detail-content__describe">
+			  <text class="region">{{ address.provinceName }}{{ address.cityName }}{{ address.regionName }}</text>
+			  <text class="detail">{{ address.detail }}</text>
+			</view>
+		  </block>
+		  <block v-else>
+			<view class="detail-content__describe dis-flex">
+			  <text class="col-6">请选择配送地址</text>
+			</view>
+		  </block>
+		</view>
+		<view class="detail-arrow dis-flex">
+		  <text class="iconfont icon-arrow-right"></text>
+		</view>
+	  </view>
+	</view>
+	
     <!-- 商品列表 -->
     <view class="m-top20">
       <view v-for="(item, index) in goodsCart" :key="index" class="checkout_list">
@@ -70,10 +102,16 @@
   import * as Verify from '@/utils/verify'
   import * as CartApi from '@/api/cart'
   import * as SettlementApi from '@/api/settlement'
+  import DeliveryTypeEnum from '@/common/enum/order/DeliveryType'
   import PayTypeEnum from '@/common/enum/order/PayType'
   import { wxPayment } from '@/utils/app'
+  import selectSwitch from "@/components/xuan-switch/xuan-switch.vue";
+  import * as AddressApi from '@/api/address'
 
   export default {
+	components: {
+	  selectSwitch
+	},
     data() {
       return {
         // 枚举类
@@ -90,7 +128,10 @@
         disabled: false,
         goodsCart: [],
 		totalPrice: 0,
-		totalNum: 0
+		totalNum: 0,
+		orderModeList: ['配送', '自取'],
+		orderMode: true,
+		address: null
       }
     },
 
@@ -108,6 +149,8 @@
 		const app = this
 		// 获取购物车信息
         app.getCartDetail(app.options.goodsId, app.options.skuId, app.options.buyNum)
+		// 获取默认收货地址
+		app.getDefaultAddress()
     },
 
     methods: {
@@ -126,10 +169,28 @@
         })
       },
 	  
+	  // 获取默认收货地址
+	  getDefaultAddress() {
+	    const app = this
+	    AddressApi.detail(0)
+	      .then(result => {
+	        app.address = result.data.address
+	      })
+	  },
+	  
       // 选择支付方式
       handleSelectPayType(value) {
         this.curPayType = value
       },
+	  
+	  // 快递配送：选择收货地址
+	  onSelectAddress() {
+	     this.$navTo('pages/address/index', { from: 'checkout' })
+	  },
+	  
+	  switchMode(mode) {
+	     this.orderMode = mode
+	  },
 
       // 订单提交
       onSubmitOrder() {
@@ -137,14 +198,24 @@
         if (app.disabled) {
           return false
         }
+		
         // 表单验证
-        if (!app.onVerifyFrom()) {
+        if (app.orderMode && app.address == undefined) {
+		  app.$toast('请先选择配送地址哦')
           return false
         }
+		
+		// 配送或自取
+		let orderMode = "express";
+		if (!app.orderMode) {
+			orderMode = "oneself";
+		}
+		
         // 按钮禁用
         app.disabled = true
+		
         // 请求api
-        SettlementApi.submit(0, "", "goods", app.remark, 0, 0, app.options.goodsId, app.options.skuId, app.options.buyNum)
+        SettlementApi.submit(0, "", "goods", app.remark, 0, 0, app.options.goodsId, app.options.skuId, app.options.buyNum, orderMode)
           .then(result => app.onSubmitCallback(result))
           .catch(err => {
             if (err.result) {
@@ -184,18 +255,7 @@
         setTimeout(() => {
           this.$navTo('pages/order/detail?orderId='+orderId)
         }, 1000)
-      },
-
-      // 表单验证
-      onVerifyFrom() {
-        const app = this
-        if (app.hasError) {
-          app.$toast(app.errorMsg)
-          return false
-        }
-        return true
-      },
-
+      }
     }
   }
 </script>

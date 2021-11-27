@@ -7,24 +7,24 @@
           <text class="phone">{{ item.phone }}</text>
         </view>
         <view class="address">
-          <text class="region" v-for="(region, idx) in item.region" :key="idx">{{ region }}</text>
+          <text class="region">{{ item.provinceName }}{{ item.cityName }}{{ item.regionName }}</text>
           <text class="detail">{{ item.detail }}</text>
         </view>
         <view class="line"></view>
         <view class="item-option">
           <view class="_left">
-            <label class="item-radio" @click.stop="handleSetDefault(item.address_id)">
-              <radio class="radio" color="#fa2209" :checked="item.address_id == defaultId"></radio>
-              <text class="text">{{ item.address_id == defaultId ? '默认' : '选择' }}</text>
+            <label class="item-radio" @click.stop="handleSetDefault(item.id, item.isDefault)">
+              <radio class="radio" color="#fa2209" :checked="item.isDefault == 'Y'"></radio>
+              <text class="text">{{ item.isDefault == 'Y' ? '默认' : '选择' }}</text>
             </label>
           </view>
           <view class="_right">
             <view class="events">
-              <view class="event-item" @click="handleUpdate(item.address_id)">
+              <view class="event-item" @click="handleUpdate(item.id)">
                 <text class="iconfont icon-edit"></text>
                 <text class="title">编辑</text>
               </view>
-              <view class="event-item" @click="handleRemove(item.address_id)">
+              <view class="event-item" @click="handleRemove(item.id)">
                 <text class="iconfont icon-delete"></text>
                 <text class="title">删除</text>
               </view>
@@ -33,7 +33,7 @@
         </view>
       </view>
     </view>
-    <empty v-if="!list.length" :isLoading="isLoading" tips="您暂无收货地址哦"/>
+    <empty v-if="!list.length" :isLoading="isLoading" tips="暂无收货地址哦.."/>
     <!-- 底部操作按钮 -->
     <view class="footer-fixed">
       <view class="btn-wrapper">
@@ -58,9 +58,7 @@
         // 正在加载
         isLoading: true,
         // 收货地址列表
-        list: [],
-        // 默认收货地址
-        defaultId: null
+        list: []
       }
     },
 
@@ -111,7 +109,7 @@
       onReorder() {
         const app = this
         app.list.sort(item => {
-          return item.address_id == app.defaultId ? -1 : 1
+          return item.isDefault == 'Y' ? -1 : 1
         })
       },
 
@@ -151,7 +149,7 @@
        */
       onRemove(addressId) {
         const app = this
-        AddressApi.remove(addressId)
+        AddressApi.remove(addressId, 'D')
           .then(result => {
             app.getPageData()
           })
@@ -161,11 +159,10 @@
        * 设置为默认地址
        * @param {Object} addressId
        */
-      handleSetDefault(addressId) {
+      handleSetDefault(addressId, is) {
         const app = this
-        AddressApi.setDefault(addressId)
+        AddressApi.setDefault(addressId, 'Y')
           .then(result => {
-            app.defaultId = addressId
             app.options.from === 'checkout' && uni.navigateBack()
           })
       }

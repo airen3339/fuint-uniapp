@@ -218,7 +218,7 @@
 	  // 更新购物车数量
 	  onAddCart(total) {
 	    this.getPageData()
-		this.$error("添加购物车成功")
+		this.$toast("添加购物车成功")
 	  },
 	  // 结算
 	  doSubmit() {
@@ -236,10 +236,12 @@
 		    .then(result => {
 			  const goodsData = result.data
 			  
-			  goodsData.skuList.forEach(function(sku, index) {
-				goodsData.skuList[index].specIds = sku.specIds.split('-')
-				goodsData.skuList[index].skuId = sku.id
-			  })
+			  if (goodsData.skuList) {
+				  goodsData.skuList.forEach(function(sku, index) {
+					goodsData.skuList[index].specIds = sku.specIds.split('-')
+					goodsData.skuList[index].skuId = sku.id
+				  })
+			  }
 			  
 			  app.goods = goodsData
 			  app.skuMode = skuMode

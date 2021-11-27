@@ -6,7 +6,8 @@ const api = {
   list: 'order/list',
   detail: 'order/detail',
   cancel: 'order/cancel',
-  pay: 'pay/doPay'
+  pay: 'pay/doPay',
+  receipt: 'order/receipt',
 }
 
 // 当前用户待处理的订单数量
@@ -32,4 +33,9 @@ export function cancel(orderId, data) {
 // 立即支付
 export function pay(orderId, payType, param) {
   return request.get(api.pay, { orderId, payType, ...param })
+}
+
+// 确认收货
+export function receipt(orderId, data) {
+  return request.get(api.receipt, { orderId, ...data })
 }

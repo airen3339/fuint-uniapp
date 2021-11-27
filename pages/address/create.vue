@@ -109,7 +109,7 @@
         app.$refs.uForm.validate(valid => {
           if (valid) {
             app.disabled = true
-            AddressApi.add(app.form)
+            AddressApi.save(form.name, form.phone, form.region[0].value, form.region[1].value, form.region[2].value, form.detail, 'A', 0)
               .then(result => {
                 app.$toast(result.message)
                 uni.navigateBack()
