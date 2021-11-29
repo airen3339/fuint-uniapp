@@ -72,7 +72,7 @@
   }
 
   .goods-name{
-    font-size: 28rpx;
+    font-size: 30rpx;
     color: #333;
   }
 
@@ -97,6 +97,20 @@
       &.balance {
         color: #ff9700;
       }
+    }
+  }
+}
+
+// 商品规格
+.goods-props {
+  padding-top: 10rpx;
+  font-size: 24rpx;
+  color: #999;
+
+  .goods-props-item {
+    float: left;
+    .group-name {
+      margin-right: 6rpx;
     }
   }
 }

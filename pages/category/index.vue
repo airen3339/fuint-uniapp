@@ -170,7 +170,7 @@
 						 if (goods.id == cart.goodsId) {
 							total = total + cart.num
 							totalBuyNum = totalBuyNum + cart.num
-							app.totalPrice = app.totalPrice + (goods.price * cart.num)
+							app.totalPrice = app.totalPrice + (cart.goodsInfo.price * cart.num)
 						 } 
 					  })
 					  app.$set(app.list[index].goodsList[key], 'buyNum', totalBuyNum)

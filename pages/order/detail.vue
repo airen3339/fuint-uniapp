@@ -72,6 +72,11 @@
           <!-- 商品信息 -->
           <view class="goods-content">
             <view class="goods-title twolist-hidden"><text>{{goods.name}}</text></view>
+			<view class="goods-props clearfix">
+			  <view class="goods-props-item" v-for="(props, idx) in goods.specList" :key="idx">
+				<text>{{ props.specValue }}</text>
+			  </view>
+			</view>
           </view>
           <!-- 交易信息 -->
           <view class="goods-trade">

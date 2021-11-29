@@ -41,7 +41,18 @@
 			<image mode="scaleToFill" :src="item.goodsInfo.logo"></image>
 		  </view>
           <view class="flow-list-right flex-box">
+			<!-- 商品名称 -->
             <text class="goods-name twolist-hidden">{{ item.goodsInfo.name }}</text>
+			
+			<!-- 商品规格 -->
+			<view class="goods-props clearfix">
+			  <view class="goods-props-item" v-for="(props, idx) in item.specList" :key="idx">
+				<text class="group-name">{{ props.specName }}: </text>
+				<text>{{ props.specValue }}；</text>
+			  </view>
+			</view>
+			
+			 <!-- 商品数量和单价 -->
             <view class="flow-list-cont dis-flex flex-x-between flex-y-center">
               <text class="small"> x {{ item.num }} </text>
               <text class="flow-cont">￥{{ item.goodsInfo.price }} </text>
