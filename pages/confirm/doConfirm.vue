@@ -64,8 +64,10 @@
 	},
     data() {
       return {
-        // 当前会员卡券ID
+        // 会员会员卡券编码
+		code: null,
         userCouponId: null,
+		userCouponCode: null,
         // 加载中
         isLoading: true,
         // 当前卡券详情
@@ -84,6 +86,7 @@
     onLoad(options) {
       // 记录ID
       this.userCouponId = options.id
+	  this.userCouponCode = options.code
       // 获取卡券详情
       this.getCouponDetail()
     },
@@ -92,7 +95,7 @@
       // 获取卡券详情
       getCouponDetail() {
         const app = this
-        myCouponApi.detail(app.userCouponId)
+        myCouponApi.detail(0, app.userCouponId, app.userCouponCode)
           .then(result => {
             app.detail = result.data
 			app.getRowCount(app.detail.useRule)

@@ -87,7 +87,7 @@
       // 获取卡券详情
       getCouponDetail() {
         const app = this
-        myCouponApi.detail(app.couponId, app.userCouponId)
+        myCouponApi.detail(app.couponId, app.userCouponId, "")
           .then(result => {
             app.detail = result.data
           })

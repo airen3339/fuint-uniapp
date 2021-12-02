@@ -228,6 +228,12 @@
 	  "style": {
 	    "navigationBarTitleText": "向商家付款"
 	  }
+	},
+	{
+	  "path": "pages/merchant/index",
+	  "style": {
+		"navigationBarTitleText": "商家管理"
+	  }
 	}
   ],
   "globalStyle": {

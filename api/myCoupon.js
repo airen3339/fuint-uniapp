@@ -18,9 +18,15 @@ export const list = (param, option) => {
 }
 
 // 卡券详情
-export function detail(couponId, userCouponId) {
-	if (parseInt(userCouponId) > 0) {
-	    return request.get(api.mydetail, { userCouponId })	
+export function detail(couponId, userCouponId, userCouponCode) {
+	if (parseInt(userCouponId) > 0 || userCouponCode.length > 0) {
+		if (userCouponId == undefined) {
+			userCouponId = 0
+		}
+		if (userCouponCode == undefined) {
+			userCouponCode = ""
+		}
+	    return request.get(api.mydetail, { userCouponId, userCouponCode })	
 	} else {
 		return request.get(api.detail, { couponId })	
 	}

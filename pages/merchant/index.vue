@@ -25,7 +25,7 @@
     </view>
 	<view v-if="isLogin" class="user-app">
 	  <view class="item">
-		<view class="tool">
+		<view class="tool" @click="scanCodeConfirm">
 	  	   <view class="icon">
 			   <image class="image" src="/static/icon/saoyisao.png" mode="scaleToFill"></image>
 		   </view>
@@ -45,7 +45,7 @@
     <!-- 我的资产 -->
     <view class="my-asset">
       <view class="asset-left flex-box dis-flex flex-x-center">
-        <view class="asset-left-item" @click="onTargetMyCoupon('C')">
+        <view class="asset-left-item">
           <view class="item-value dis-flex flex-x-center">
             <text>{{ dataInfo.userCount }}</text>
           </view>
@@ -53,7 +53,7 @@
             <text>会员数</text>
           </view>
         </view>
-        <view class="asset-left-item" @click="onTargetMyCoupon('P')">
+        <view class="asset-left-item">
           <view class="item-value dis-flex flex-x-center">
             <text>{{ dataInfo.orderCount }}</text>
           </view>
@@ -61,7 +61,7 @@
             <text>订单数</text>
           </view>
         </view>
-        <view class="asset-left-item" @click="onTargetMyCoupon('T')">
+        <view class="asset-left-item">
           <view class="item-value dis-flex flex-x-center">
             <text>{{ dataInfo.couponCount }}</text>
           </view>
@@ -243,6 +243,16 @@
             })
         })
       },
+	  
+	  // 扫码核销
+	  scanCodeConfirm() {
+		const app = this
+		uni.scanCode({
+			success:function(res){
+				app.$navTo('pages/confirm/doConfirm?code='+res.result+'&id=0')
+			}
+		});
+	  },
 
       // 跳转到登录页
       handleLogin() {
@@ -257,11 +267,6 @@
       // 跳转到我的积分页面
       onTargetPoints() {
         this.$navTo('pages/points/log')
-      },
-
-      // 跳转到我的优惠券页
-      onTargetMyCoupon(type) {
-        this.$navTo('pages/my-coupon/index?type='+type)
       },
 
       // 跳转到服务页面
@@ -312,7 +317,7 @@
         color: #ffffff;
 		
         .nick-name {
-          font-size: 32rpx;
+          font-size: 28rpx;
           font-weight: bold;
         }
 
@@ -349,17 +354,17 @@
       }
 	  .amount-info {
 		  margin-top: 1rpx;
-		  margin-left: 60rpx;
+		  margin-left: 220rpx;
 		  color: #fff;
 		  display: block;
 		  text-align: left;
 		  .amount-tip {
-			  font-size: 24rpx;
+			  font-size: 28rpx;
 		  }
 		  .amount-num {
 			  margin-top: 10rpx;
 			  font-weight: bold;
-			  font-size: 45rpx;
+			  font-size: 35rpx;
 		  }
 	  }
     }

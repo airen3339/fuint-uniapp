@@ -91,7 +91,7 @@
       getCouponDetail() {
         const app = this
         app.isLoading = false
-        myCouponApi.detail(app.couponId, app.userCouponId)
+        myCouponApi.detail(app.couponId, app.userCouponId, "")
           .then(result => {
             app.detail = result.data
 			app.getRowCount(app.detail.useRule)
