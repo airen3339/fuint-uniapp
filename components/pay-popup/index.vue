@@ -11,7 +11,7 @@
             <view class="specification-name">支付确认</view>
           </view>
           <view class="specification-content">
-            <view class="pay-item">
+            <view v-if="payInfo.usePoint > 0" class="pay-item">
                 <view class="item-point">
 					<view class="title">使用<text class="point-amount">{{ payInfo.usePoint }}</text>积分抵扣
 					   <text class="amount">￥{{ payInfo.pointAmount }}</text>
@@ -167,7 +167,7 @@
 		this.$refs.pointPopup.open('top')
 	  },
 	  doUsePoint(usePoint) {
-		if (!(/(^[1-9]\d*$)/.test(usePoint))) {
+		if (!(/(^[0-9]\d*$)/.test(usePoint))) {
 			this.$error('请输入正整数')
 		　　return false
 		}
