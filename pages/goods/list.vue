@@ -60,7 +60,7 @@
 				  <view class="attr-r">
 					  <!--购买按钮-->
 					  <view class="receive">
-						<text>立即购买</text>
+						<text>去购买</text>
 					  </view>
 				  </view>
               </view>
@@ -69,6 +69,11 @@
         </view>
       </view>
     </view>
+	<empty v-if="!list.data.length" :isLoading="isLoading" :custom-style="{ padding: '180rpx 50rpx' }" tips="没有找到相关的商品~">
+	  <view slot="slot" class="empty-ipt" @click="onTargetIndex">
+	    <text>去逛逛</text>
+	  </view>
+	</empty>
   </mescroll-body>
 </template>
 
@@ -78,6 +83,7 @@
   import * as GoodsApi from '@/api/goods'
   import { getEmptyPaginateObj, getMoreListData } from '@/utils/app'
   import Search from '@/components/search'
+  import Empty from '@/components/empty'
 
   const pageSize = 15
   const showViewKey = 'GoodsList-ShowView';
@@ -85,7 +91,8 @@
   export default {
     components: {
       MescrollBody,
-      Search
+      Search,
+	  Empty
     },
 
     mixins: [MescrollMixin],
@@ -143,6 +150,11 @@
       setShowView() {
         this.showView = uni.getStorageSync(showViewKey) || true
       },
+	  
+	  // 点击跳转到首页
+	  onTargetIndex() {
+	    this.$navTo('pages/index/index')
+	  },
 
       /**
        * 获取商品列表
@@ -154,7 +166,7 @@
         const param = {
           sortType: app.sortType,
           sortPrice: Number(app.sortPrice),
-          categoryId: app.options.categoryId || 0,
+          cateId: app.options.categoryId || 0,
           name: app.options.search || '',
           page: pageNo
         }
@@ -258,7 +270,19 @@
       color: #505050;
     }
   }
-
+  // 空数据按钮
+  .empty-ipt {
+    width: 220rpx;
+    margin: 20rpx auto;
+    font-size: 28rpx;
+    height: 64rpx;
+    line-height: 64rpx;
+    text-align: center;
+    color: #fff;
+    border-radius: 50rpx;
+    background: linear-gradient(to right, #00acac, #00acac);
+  }
+  
   // 排序组件
   .store-sort {
     position: sticky;
@@ -376,15 +400,14 @@
       color: #e49a3d;
     }
 	.receive {
-	  height: 46rpx;
-	  width: 128rpx;
-	  line-height: 46rpx;
-	  text-align: center;
-	  border: 1px solid #f8df00;
-	  border-radius: 20rpx;
-	  color: #f86d48;
-	  background: #f8df98;
-	  font-size: 22rpx;
+	  color: #FFFFFF;
+	  float: right;
+	  margin-right: 20rpx;
+	  border: solid 1rpx #00acac;
+	  background: #00acac;
+	  padding: 8rpx 20rpx 8rpx 20rpx;
+	  border-radius: 26rpx;
+	  display: block;
 	  &.state {
 	    border: none;
 		color: #cccccc;

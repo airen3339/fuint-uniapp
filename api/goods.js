@@ -20,7 +20,7 @@ export const list = param => {
 
 // 商品搜索
 export const search = param => {
-  return request.get(api.search, param)
+  return request.post(api.search,  param)
 }
 
 // 商品详情
