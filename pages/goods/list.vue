@@ -28,38 +28,38 @@
 
     <!-- 商品列表 -->
     <view class="goods-list clearfix" :class="['column-1']">
-      <view class="goods-item" v-for="(item, index) in list.data" :key="index" @click="onTargetDetail(item.goods_id, item.type)">
+      <view class="goods-item" v-for="(item, index) in list.data" :key="index" @click="onTargetDetail(item.id, item.type)">
         <!-- 单列显示 -->
         <view v-if="showView" class="dis-flex">
           <!-- 商品图片 -->
           <view class="goods-item_left">
-            <image class="image" :src="item.goods_image"></image>
+            <image class="image" :src="item.logo"></image>
           </view>
           <view class="goods-item_right">
             <!-- 商品名称 -->
             <view class="goods-name twolist-hidden">
-              <text>{{ item.goods_name }}</text>
+              <text>{{ item.name }}</text>
             </view>
             <view class="goods-item_desc">
               <!-- 商品卖点 -->
               <view class="desc-selling_point dis-flex">
-                <text class="onelist-hidden">{{ item.selling_point }}</text>
+                <text class="onelist-hidden">{{ item.salepoint }}</text>
               </view>
               <view class="coupon-attr">
 				  <view class="attr-l">
 					  <!-- 销量 -->
 					  <view class="desc-goods_sales dis-flex">
-					    <text>已售{{ item.goods_sales }}</text>
+					    <text>已售{{ item.initSale }}</text>
 					  </view>
 					  <!-- 价格 -->
 					  <view class="desc_footer">
-					    <text class="price_x">¥{{ item.goods_price_min }}</text>
-					    <text class="price_y col-9" v-if="item.line_price_min > 0">¥{{ item.line_price_min }}</text>
+					    <text class="price_x">¥{{ item.price }}</text>
+					    <text class="price_y col-9" v-if="item.linePrice > 0">¥{{ item.linePrice }}</text>
 					  </view>
 				  </view>
 				  <view class="attr-r">
 					  <!--购买按钮-->
-					  <view class="receive" @click="receive(item.goods_id)">
+					  <view class="receive">
 						<text>立即购买</text>
 					  </view>
 				  </view>
@@ -155,126 +155,20 @@
           sortType: app.sortType,
           sortPrice: Number(app.sortPrice),
           categoryId: app.options.categoryId || 0,
-          goodsName: app.options.search || '',
+          name: app.options.search || '',
           page: pageNo
         }
 		
-		// 范例数据
-		let data = [{
-				"goods_sales": 363,
-				"goods_id": 10007,
-				"goods_name": "五一5元优惠券",
-				"type":"C",
-				"goods_no": "",
-				"selling_point": "",
-				"spec_type": 20,
-				"goods_price_min": "5.00",
-				"goods_price_max": "1699.00",
-				"line_price_min": "0.00",
-				"line_price_max": "0.00",
-				"stock_total": 1988,
-				"delivery_id": 10001,
-				"is_points_gift": 1,
-				"is_points_discount": 1,
-				"is_alone_points_discount": 0,
-				"points_discount_config": "",
-				"is_enable_grade": 1,
-				"is_alone_grade": 0,
-				"alone_grade_equity": [],
-				"status": 10,
-				"goods_image": "/static/coupon/3.png",
-				"is_user_grade": false
-			}, {
-				"goods_sales": 0,
-				"goods_id": 10006,
-				"goods_name": "五一20元优惠券",
-				"type":"C",
-				"goods_no": "",
-				"selling_point": "",
-				"spec_type": 20,
-				"goods_price_min": "20.00",
-				"goods_price_max": "999.00",
-				"line_price_min": "0.00",
-				"line_price_max": "0.00",
-				"stock_total": 845,
-				"delivery_id": 10001,
-				"is_points_gift": 1,
-				"is_points_discount": 1,
-				"is_alone_points_discount": 0,
-				"points_discount_config": "",
-				"is_enable_grade": 1,
-				"is_alone_grade": 0,
-				"alone_grade_equity": [],
-				"status": 10,
-				"goods_image": "/static/coupon/3.png",
-				"is_user_grade": false
-			}, {
-				"goods_sales": 0,
-				"goods_id": 10006,
-				"goods_name": "五一20元优惠券",
-				"type":"T",
-				"goods_no": "",
-				"selling_point": "",
-				"spec_type": 20,
-				"goods_price_min": "30.00",
-				"goods_price_max": "999.00",
-				"line_price_min": "0.00",
-				"line_price_max": "0.00",
-				"stock_total": 845,
-				"delivery_id": 10001,
-				"is_points_gift": 1,
-				"is_points_discount": 1,
-				"is_alone_points_discount": 0,
-				"points_discount_config": "",
-				"is_enable_grade": 1,
-				"is_alone_grade": 0,
-				"alone_grade_equity": [],
-				"status": 10,
-				"goods_image": "/static/coupon/3.png",
-				"is_user_grade": false
-			}, {
-				"goods_sales": 0,
-				"goods_id": 10006,
-				"goods_name": "五一20元优惠券",
-				"type":"P",
-				"goods_no": "",
-				"selling_point": "",
-				"spec_type": 20,
-				"goods_price_min": "50.00",
-				"goods_price_max": "999.00",
-				"line_price_min": "0.00",
-				"line_price_max": "0.00",
-				"stock_total": 845,
-				"delivery_id": 10001,
-				"is_points_gift": 1,
-				"is_points_discount": 1,
-				"is_alone_points_discount": 0,
-				"points_discount_config": "",
-				"is_enable_grade": 1,
-				"is_alone_grade": 0,
-				"alone_grade_equity": [],
-				"status": 10,
-				"goods_image": "/static/coupon/3.png",
-				"is_user_grade": false
-			}]
-			let result = {"data":{"list":{"total":2, "per_page":15, "current_page":1, "last_page":1,
-			           "data":data,
-					   }}}
-		
-		const newList = result.data.list
-		app.list.data = getMoreListData(newList, app.list, pageNo)
-		/*
         return new Promise((resolve, reject) => {
-          GoodsApi.list(param)
+          GoodsApi.search(param)
             .then(result => {
               // 合并新数据
-              const newList = result.data.list
-			  alert(newList)
+              const newList = result.data
               app.list.data = getMoreListData(newList, app.list, pageNo)
               resolve(newList)
             })
             .catch(reject)
-        })*/
+        })
       },
 
       // 切换排序方式
@@ -297,19 +191,10 @@
 
       // 跳转商品详情页
       onTargetDetail(goodsId, type) {
-        if (type === 'P') {
-        	this.$navTo(`pages/goods/detail`, { goodsId })
-        } else {
-            return
-        }
+        this.$navTo(`pages/goods/detail`, { goodsId })
       },
-	  
-	  // 领取卡券
-	  receive(goods_id) {
-	  	this.$success("领取成功！")
-	  },
 
-      //卡券搜索
+      //商品搜索
       handleSearch() {
         const searchPageUrl = 'pages/search/index'
         // 判断来源页面
@@ -450,8 +335,9 @@
 
       .image {
         display: block;
-        width: 240rpx;
-        height: 240rpx;
+        width: 220rpx;
+        height: 200rpx;
+        border-radius: 10rpx;
       }
     }
 
