@@ -166,37 +166,6 @@
 		app.showPopup = !app.showPopup
 		
 		return true;
-	  },
-	  
-	  // 订单提交成功后回调
-	  onSubmitCallback(result) {
-	    const app = this
-	    // 微信支付
-	    if (result.data.payType == PayTypeEnum.WECHAT.value) {
-	      wxPayment(result.data.payment)
-	        .then(() => {
-				uni.showModal({
-				  title: '支付结果',
-				  content: '支付成功！',
-				  showCancel: false,
-				  success(o) {
-				    if (o.confirm) {
-				       app.form.payAmount = ""
-				       app.form.remark = ""
-				    }
-				  }
-				})
-			})
-	        .catch(err => app.$error('支付失败'))
-	        .finally(() => {
-	          //empty
-	        })
-	    }
-	  	
-		// 余额支付
-	    if (result.data.payType == PayTypeEnum.BALANCE.value) {
-	      app.$error('支付成功')
-	    }
 	  }
     }
   }

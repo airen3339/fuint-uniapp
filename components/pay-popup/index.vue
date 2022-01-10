@@ -141,18 +141,10 @@
 	    if (result.data.payType == PayTypeEnum.WECHAT.value) {
 	      wxPayment(result.data.payment)
 	        .then(() => {
-	  				uni.showModal({
-	  				  title: '支付结果',
-	  				  content: '支付成功！',
-	  				  showCancel: false,
-	  				  success(o) {
-	  				    if (o.confirm) {
-						   app.$router.go(0)
-	  				    }
-	  				  }
-	  				})
-	  			})
-	        .catch(err => app.$error('支付失败'))
+	  			app.$navTo(`pages/pay/result`, { amount: parseFloat(app.payInfo.payAmount).toFixed(2), point: parseInt(app.payInfo.usePoint)})
+	  		})
+	        .catch(err => 
+			app.$error('支付失败'))
 	        .finally(() => {
 	          //empty
 	        })
@@ -160,7 +152,7 @@
 	  	
 	  	// 余额支付
 	    if (result.data.payType == PayTypeEnum.BALANCE.value) {
-	      app.$error('支付成功')
+	        app.$navTo(`pages/pay/result`, { amount: parseFloat(app.payInfo.payAmount).toFixed(2), point: parseInt(app.payInfo.usePoint)})
 	    }
 	  },
 	  modifyPoint() {
